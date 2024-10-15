@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -9,12 +9,12 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
+        </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"
         integrity="sha512-2rNj2KJ+D8s1ceNasTIex6z4HWyOnEYLVC3FigGOmyQCZc2eBXKgOxQmo3oKLHyfcj53uz4QMsRCWNbLd32Q1g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
-        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/css/templatemo-style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
@@ -99,7 +99,7 @@
     </div>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Função para carregar os estados
             $.ajaxSetup({
                 headers: {
@@ -109,13 +109,13 @@
 
             function carregarEstados() {
                 $.post('/api/estados')
-                    .done(function(data) {
-                        data.forEach(function(val) {
+                    .done(function (data) {
+                        data.forEach(function (val) {
                             $('#estado').append('<option value="' + val.id_estado + '">' + val.nome +
                                 '</option>');
                         });
                     })
-                    .fail(function(xhr, status, error) {
+                    .fail(function (xhr, status, error) {
                         console.error('Erro ao carregar estados:', status, error);
                         console.log('Erro ao carregar estados: ' + xhr.responseText);
                     });
@@ -125,17 +125,17 @@
             function carregarCidades(estadoId) {
                 if (estadoId) {
                     $.post('/api/cidades', {
-                            estado: estadoId
-                        })
-                        .done(function(data) {
+                        estado: estadoId
+                    })
+                        .done(function (data) {
                             $('#cidade').empty().append('<option value="">Selecione a Cidade</option>');
-                            data.forEach(function(val) {
+                            data.forEach(function (val) {
                                 $('#cidade').append('<option value="' + val.id_cidade + '">' + val
                                     .nome + '</option>');
                             });
                             $('#cidade').prop('disabled', false);
                         })
-                        .fail(function(xhr, status, error) {
+                        .fail(function (xhr, status, error) {
                             console.error('Erro ao carregar cidades:', status, error);
                             console.log('Erro ao carregar cidades: ' + xhr.responseText);
                         });
@@ -149,17 +149,17 @@
             function carregarBairros(cidadeId) {
                 if (cidadeId) {
                     $.post('/api/bairros', {
-                            cidade: cidadeId
-                        })
-                        .done(function(data) {
+                        cidade: cidadeId
+                    })
+                        .done(function (data) {
                             $('#bairro').empty().append('<option value="">Selecione o Bairro</option>');
-                            data.forEach(function(val) {
+                            data.forEach(function (val) {
                                 $('#bairro').append('<option value="' + val.id_bairro + '">' + val
                                     .nome + '</option>');
                             });
                             $('#bairro').prop('disabled', false);
                         })
-                        .fail(function(xhr, status, error) {
+                        .fail(function (xhr, status, error) {
                             console.error('Erro ao carregar bairros:', status, error);
                             console.log('Erro ao carregar bairros: ' + xhr.responseText);
                             $('#bairro').empty().append('<option value="">Nenhum bairro encontrado</option>')
@@ -174,22 +174,22 @@
             // Mapeamento de categorias com base no tipo
             const categoriasPorTipo = {
                 residencial: [{
-                        valor: "venda",
-                        texto: "Venda Residencial"
-                    },
-                    {
-                        valor: "aluguel",
-                        texto: "Aluguel Residencial"
-                    }
+                    valor: "venda",
+                    texto: "Venda Residencial"
+                },
+                {
+                    valor: "aluguel",
+                    texto: "Aluguel Residencial"
+                }
                 ],
                 comercial: [{
-                        valor: "venda",
-                        texto: "Venda Comercial"
-                    },
-                    {
-                        valor: "aluguel",
-                        texto: "Aluguel Comercial"
-                    }
+                    valor: "venda",
+                    texto: "Venda Comercial"
+                },
+                {
+                    valor: "aluguel",
+                    texto: "Aluguel Comercial"
+                }
                 ]
             };
 
@@ -197,23 +197,23 @@
             carregarEstados();
 
             // Evento para carregar cidades quando o estado for selecionado
-            $('#estado').on('change', function() {
+            $('#estado').on('change', function () {
                 let estadoId = $(this).val();
                 carregarCidades(estadoId);
             });
 
             // Evento para carregar bairros quando a cidade for selecionada
-            $('#cidade').on('change', function() {
+            $('#cidade').on('change', function () {
                 let cidadeId = $(this).val();
                 carregarBairros(cidadeId);
             });
 
             // Evento para carregar categorias quando o tipo for selecionado
-            $('#tipo').on('change', function() {
+            $('#tipo').on('change', function () {
                 let tipoSelecionado = $(this).val();
                 $('#categoria').empty().append('<option value="">Selecione a Categoria</option>');
                 if (tipoSelecionado && categoriasPorTipo[tipoSelecionado]) {
-                    categoriasPorTipo[tipoSelecionado].forEach(function(categoria) {
+                    categoriasPorTipo[tipoSelecionado].forEach(function (categoria) {
                         $('#categoria').append('<option value="' + categoria.valor + '">' +
                             categoria.texto + '</option>');
                     });
@@ -224,7 +224,7 @@
             });
 
             // Ação ao clicar no botão Confirmar
-            $('#btn-search').on('click', function() {
+            $('#btn-search').on('click', function () {
                 // Obtém os valores selecionados
                 let estado = $('#estado').find('option:selected').text();
                 let cidade = $('#cidade').find('option:selected').text();
@@ -268,9 +268,9 @@
     </script>
     <div class="container-fluid tm-container-content tm-mt-60">
         <div class="row mb-4">
-            <h2 class="col-6 tm-text-primary">
-                Lojas
-            </h2>
+            <h6 class="col-6 tm-text-primary">
+                Disk Entregas no Brasil &rsaquo;
+            </h6>
             <div class="col-6 d-flex justify-content-end align-items-center">
                 <form action="" class="tm-text-primary">
                     Pagina <input type="text" value="{{ $lojas->currentPage() }}" size="1"
@@ -329,28 +329,34 @@
         <div class="container-fluid tm-container-small">
             <div class="row">
                 <div class="col-lg-6 col-md-12 col-12 px-5 mb-5">
-                    <h3 class="tm-text-primary mb-4 tm-footer-title">Disk entrega</h3>
-                    <p>Disk entrega é um sistema de locação de lojas</p>
+                    <h3 class="tm-text-primary mb-4 tm-footer-title">DISK ENTREGAS | PORTAL OFICIAL ®</h3>
+                    <p>
+                        PRODUTOS, SERVIÇOS E ALIMENTOS QUE CHEGAM ATÉ VOCÊ.
+                        <br>
+                        PARTICIPE VOCÊ TAMBÉM!
+                    </p>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-6 col-12 px-5 mb-5">
                     <ul class="tm-footer-links pl-0">
-                        <li><a href="/cadastre">Contrate</a></li>
-                        <li><a href="/sobre">Sobre nós</a></li>
-                        <li><a href="/contato">Contato</a></li>
-                        <li><a href="/login">Login Estabelecimento</a></li>
+                        <li><a href="/cadastre">CONTRATE</a></li>
+                        <li><a href="/sobre">SOBRE NÓS</a></li>
+                        <li><a href="/contato">CONTATO</a></li>
                     </ul>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-lg-8 col-md-7 col-12 px-5 mb-3">
-                    Copyright 2024 Disk entrega.
+                    <div align="center">
+                        DISK ENTREGAS | PORTAL OFICIAL ®
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
     <script>
-        $(window).on("load", function() {
+        $(window).on("load", function () {
             $('body').addClass('loaded');
         });
     </script>

@@ -4,12 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Sidebar e Barra Inferior</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        .conteudo {
+            display: flex;
+            padding-left: 255px;
+            width 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        @media screen and (max-width: 765px) {
+            .conteudo {
+                display: flex;
+                padding-left: 0px;
+                width 100%;
+                height: 100%;
+                position: relative;
+            }
+        }
+
         /* Estilo customizado para o menu */
         .sidebar {
             position: fixed;
@@ -92,37 +105,37 @@
     <div class="sidebar d-none d-md-block">
         <ul class="nav flex-column mt-3">
             <li class="nav-item">
-                <a href="#" class="nav-link active">
+                <a href="/loja" class="nav-link {{ $menu == 'inicial' ? 'active' : '' }}">
                     <i class="fa fa-home"></i>
                     Home
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="/loja/pedidos" class="nav-link {{ $menu == 'pedidos' ? 'active' : '' }}">
                     <i class="fa fa-search"></i>
                     Pedidos
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="/loja/categorias" class="nav-link {{ $menu == 'item' ? 'active' : '' }}">
                     <i class="fa fa-list"></i>
                     Categorias
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="/loja/produtos" class="nav-link {{ $menu == 'produto' ? 'active' : '' }}">
                     <i class="fa fa-box"></i>
                     Produtos
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="/loja/dados" class="nav-link {{ $menu == 'dados' ? 'active' : '' }}">
                     <i class="fa fa-user"></i>
                     Meus dados
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="/loja/suporte" class="nav-link {{ $menu == 'suporte' ? 'active' : '' }}">
                     <i class="fa fa-life-ring"></i>
                     Suporte
                 </a>
@@ -134,92 +147,50 @@
     <nav class="navbar fixed-bottom bg-light menu-bar d-md-none">
         <ul class="nav nav-pills justify-content-around w-100">
             <li class="nav-item">
-                <a href="#" class="nav-link active">
+                <a href="/loja" class="nav-link">
                     <i class="fa fa-home"></i>
                     Home
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="/loja/pedidos" class="nav-link {{ $menu == 'pedidos' ? 'active' : '' }}">
                     <i class="fa fa-search"></i>
                     Pedidos
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="/loja/categorias" class="nav-link {{ $menu == 'item' ? 'active' : '' }}">
                     <i class="fa fa-list"></i>
                     Categorias
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="#/loja/produtos" class="nav-link {{ $menu == 'produto' ? 'active' : '' }} ">
                     <i class="fa fa-box"></i>
                     Produtos
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fa fa-user"></i>
-                    Meus dados
-                </a>
-            </li>
-            <!-- Ícone do menu hambúrguer como item da barra inferior -->
-            <li class="nav-item">
-                <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#menuMobile">
-                    <i class="fa fa-bars"></i>
-                    Menu
-                </a>
-            </li>
-        </ul>
-    </nav>
-
-    <!-- Menu expansível (apenas para mobile) -->
-    <div class="collapse full-menu d-md-none" id="menuMobile">
-        <ul class="nav nav-pills flex-column menu-bar">
-            <li class="nav-item">
-                <a href="#" class="nav-link active" data-bs-dismiss="collapse">
-                    <i class="fa fa-home"></i>
-                    Home
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" data-bs-dismiss="collapse">
-                    <i class="fa fa-search"></i>
-                    Pedidos
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" data-bs-dismiss="collapse">
-                    <i class="fa fa-list"></i>
-                    Categorias
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" data-bs-dismiss="collapse">
-                    <i class="fa fa-box"></i>
-                    Produtos
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" data-bs-dismiss="collapse">
+                <a href="/loja/dados" class="nav-link {{ $menu == 'dados' ? 'active' : '' }}">
                     <i class="fa fa-user"></i>
                     Meus dados
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link" data-bs-dismiss="collapse">
+                <a href="/loja/suporte" class="nav-link {{ $menu == 'suporte' ? 'active' : '' }}">
                     <i class="fa fa-life-ring"></i>
                     Suporte
                 </a>
             </li>
         </ul>
-    </div>
+    </nav>
+
 
     <!-- Bootstrap JS e dependências -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Fecha o menu ao clicar fora dele
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const menuMobile = document.getElementById('menuMobile');
             const toggleButton = document.querySelector('[data-bs-target="#menuMobile"]');
 

@@ -48,24 +48,43 @@ Route::get('/login', function () {
     return view('usuario.login');
 
 });
-
-
-
 Route::get('/loja', function () {
-    return view('usuario.loja');
+    $loja = 'teste';
+    return view('usuario.loja', ['loja' => $loja]);
+});
+
+Route::get('/loja/pedidos', function () {
+    return view('usuario.pedidos');
+});
+Route::get('/loja/categorias', function () {
+    return view('usuario.itens');
+});
+Route::get('/loja/produtos', function () {
+    return view('usuario.produtos');
+});
+
+Route::get('/loja/dados', function () {
+    return view('usuario.dados');
+});
+
+Route::get('/loja/suporte', function () {
+    return view('usuario.suporte');
 });
 
 Route::get('/{estado}', function ($estado) {
     $estadoObj = Estado::where('nome', $estado)->orWhere('uf', $estado)->first();
 
-    if (!$estadoObj) {
-        return abort(404, 'Estado não encontrado');
+    if ($estadoObj) {
+        $lojas = Loja::whereJsonContains('estados_atendidos', $estadoObj->id_estado)->paginate(16);
+        return view('welcome', ['lojas' => $lojas]);
     }
-
-    $lojas = Loja::whereJsonContains('estados_atendidos', $estadoObj->id_estado)->paginate(16);
-
-    return view('welcome', ['lojas' => $lojas]);
+    $loja = Loja::where('nome', $estado)->first();
+    if ($loja) {
+        return view('loja', ['loja' => $loja]);
+    }
+    return abort(404, 'Estado ou Loja não encontrado');
 });
+
 
 Route::get('/{estado}/{cidade}', function ($estado, $cidade) {
     $estadoObj = Estado::where('nome', $estado)->orWhere('uf', $estado)->first();
