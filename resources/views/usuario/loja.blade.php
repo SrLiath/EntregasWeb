@@ -16,7 +16,7 @@
 </div>
 <script>
     $(document).ready(function () {
-        var currentUrl = window.location.href;
+        var currentUrl = window.location.origin;
         var newUrl = currentUrl + '/{{$loja}}';
         var iframe = $('<iframe>', {
             src: newUrl,
