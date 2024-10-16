@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Tipo;
 use App\Models\Categoria;
+use App\Models\Plano;
 class Controller
 {
     public function Tipostore(Request $request)
@@ -77,6 +78,28 @@ class Controller
         $categoria->delete();
 
         return response()->json(['message' => 'Categoria deletada com sucesso!']);
+    }
+
+    public function updatePlanos(Request $request, $id)
+    {
+        // Validação dos dados de entrada
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'descricao' => 'nullable|string',
+            'valor' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
+        ]);
+
+        // Encontrar o plano pelo ID
+        $plano = Plano::find($id);
+
+        if (!$plano) {
+            return response()->json(['message' => 'Plano não encontrado.'], 404);
+        }
+
+        // Atualizar os atributos do plano
+        $plano->update($request->only(['nome', 'descricao', 'valor']));
+
+        return response()->json(['message' => 'Plano atualizado com sucesso.', 'plano' => $plano], 200);
     }
 
 }

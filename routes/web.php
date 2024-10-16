@@ -1,12 +1,16 @@
 <?php
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\PedidoController;
+use App\Models\Pedido;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use App\Models\Loja;
 use App\Models\Estado;
 use App\Models\Bairro;
 use App\Models\Cidade;
 use App\Models\Tipo;
+use App\Models\Plano;
 use App\Http\Controllers\LocalidadesController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaymentGateway;
@@ -14,8 +18,19 @@ use App\Http\Middleware\CheckAdmin;
 Route::middleware([CheckAdmin::class])->group(function () {
     Route::get('/xxmigadmin', function () {
         $tipos = Tipo::all();
-        return view('admin.admin', ['tipos' => $tipos]);
+        $lojas = Loja::with(['tipo', 'categoria'])->get();
+        $planos = Plano::take(3)->get();
+
+        return view('admin.admin', ['tipos' => $tipos, 'planos' => $planos, 'lojas' => $lojas]);
     });
+    Route::post('/api/estados/store', [LocalidadesController::class, 'storeEstado']);
+    Route::post('/api/cidades/store', [LocalidadesController::class, 'storeCidade']);
+    Route::post('/api/bairros/store', [LocalidadesController::class, 'storeBairro']);
+    Route::post('/tipos', [Controller::class, 'Tipostore']);
+    Route::delete('/tipos/{id}', [Controller::class, 'Tipodestroy']);
+    Route::post('/tipos/categorias/add', [Controller::class, 'addCategoria']);
+    Route::delete('/tipos/categorias/{id}', [Controller::class, 'destroyCategoria']);
+    Route::put('/api/planos/{id}', [Controller::class, 'updatePlanos']);
 });
 
 Route::get('/xxmigadmin/login', [AuthController::class, 'showLoginForm']);
@@ -24,14 +39,16 @@ Route::post('/xxmigadmin/logout', [AuthController::class, 'logout'])->name('admi
 
 Route::get('/', function () {
     $lojas = Loja::paginate(16);
-    $tipos = Tipo::find('*');
-    return view('welcome', ['lojas' => $lojas]);
+    $tipos = Tipo::all();
+    return view('welcome', ['lojas' => $lojas, 'tipos' => $tipos]);
 })->name('index');
 
 Route::get('/cadastre', function () {
     $lojas = Loja::paginate(16);
     $tipos = Tipo::find('*');
-    return view('cadastre', ['lojas' => $lojas]);
+    $planos = Plano::take(3)->get();
+
+    return view('cadastre', ['lojas' => $lojas, 'planos' => $planos]);
 });
 Route::get('/checkout', [LocalidadesController::class, 'verifyCheckout']);
 
@@ -56,7 +73,25 @@ Route::get('/loja', function () {
 });
 
 Route::get('/loja/pedidos', function () {
-    return view('usuario.pedidos');
+    $pedidos = Pedido::paginate(16);
+    $today = Carbon::today();
+
+    // Contagem de pedidos por status
+    $totalHoje = Pedido::whereDate('data_pedido', $today)->count();
+    $completo = Pedido::whereDate('data_pedido', $today)->where('status', 'completo')->count();
+    $negado = Pedido::whereDate('data_pedido', $today)->where('status', 'negado')->count();
+    $andamento = Pedido::whereDate('data_pedido', $today)->where('status', 'andamento')->count();
+
+    // Passando as variáveis para a view
+    return view('usuario.pedidos', [
+        'pedidos' => $pedidos,
+        'totalHoje' => $totalHoje,
+        'completo' => $completo,
+        'negado' => $negado,
+        'andamento' => $andamento,
+        'loja',
+        'teste'
+    ]);
 });
 Route::get('/loja/categorias', function () {
     return view('usuario.itens');
@@ -78,7 +113,8 @@ Route::get('/{estado}', function ($estado) {
 
     if ($estadoObj) {
         $lojas = Loja::whereJsonContains('estados_atendidos', $estadoObj->id_estado)->paginate(16);
-        return view('welcome', ['lojas' => $lojas]);
+        $tipos = Tipo::all();
+        return view('welcome', ['lojas' => $lojas, 'tipos' => $tipos]);
     }
     $loja = Loja::where('nome', $estado)->first();
     if ($loja) {
@@ -101,7 +137,8 @@ Route::get('/{estado}/{cidade}', function ($estado, $cidade) {
         ->whereJsonContains('cidades_atendidas', $cidadeObj->id_cidade)
         ->paginate(16);
 
-    return view('welcome', ['lojas' => $lojas]);
+    $tipos = Tipo::all();
+    return view('welcome', ['lojas' => $lojas, 'tipos' => $tipos]);
 });
 
 Route::get('/{estado}/{cidade}/{bairro}', function ($estado, $cidade, $bairro) {
@@ -122,26 +159,21 @@ Route::get('/{estado}/{cidade}/{bairro}', function ($estado, $cidade, $bairro) {
         ->whereJsonContains('bairros_atendidos', $bairroObj->id_bairro)
         ->paginate(16);
 
-    return view('welcome', ['lojas' => $lojas]);
+    $tipos = Tipo::all();
+    return view('welcome', ['lojas' => $lojas, 'tipos' => $tipos]);
 });
 
 
 // Rotas para Estados
 Route::post('/api/estados', [LocalidadesController::class, 'estados']);
-Route::post('/api/estados/store', [LocalidadesController::class, 'storeEstado']);
-
 // Rotas para Cidades
 Route::post('/api/cidades', [LocalidadesController::class, 'cidades']);
-Route::post('/api/cidades/store', [LocalidadesController::class, 'storeCidade']);
-
 // Rotas para Bairros
 Route::post('/api/bairros', [LocalidadesController::class, 'bairros']);
-Route::post('/api/bairros/store', [LocalidadesController::class, 'storeBairro']);
-Route::post('/tipos', [Controller::class, 'Tipostore']);
-
 // Rota para deletar um tipo pelo ID
-Route::delete('/tipos/{id}', [Controller::class, 'Tipodestroy']);
 Route::post('/tipos/categorias', [Controller::class, 'getCategorias']);
 
-Route::post('/tipos/categorias/add', [Controller::class, 'addCategoria']);
-Route::delete('/tipos/categorias/{id}', [Controller::class, 'destroyCategoria']);
+
+Route::post('/pedido/confirmar/{id}', [PedidoController::class, 'confirmar'])->name('pedido.confirmar');
+Route::post('/pedido/negar/{id}', [PedidoController::class, 'negar'])->name('pedido.negar');
+Route::post('/pedido/completar/{id}', [PedidoController::class, 'completar'])->name('pedido.completar');

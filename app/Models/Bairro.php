@@ -8,6 +8,11 @@ class Bairro extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'nome',  // Add this line
+        'id',
+        'cidade'
+    ];
     public function cidade()
     {
         return $this->belongsTo(Cidade::class, 'id_cidade');

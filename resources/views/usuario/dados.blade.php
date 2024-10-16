@@ -64,7 +64,6 @@
             .profile-header {
                 position: relative;
                 height: 200px;
-                overflow: hidden;
             }
 
             .profile-banner {

@@ -7,7 +7,8 @@
     </button>
 
     <!-- Modal para Criar Loja -->
-    <div class="modal fade" id="createStoreModal" tabindex="-1" aria-labelledby="createStoreModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createStoreModal" tabindex="-1" aria-labelledby="createStoreModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -78,35 +79,22 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>Nome Exemplo 1</td>
-                <td>08:00:00</td>
-                <td>17:00:00</td>
-                <td>1</td>
-                <td>2</td>
-                <td>Estado 1, Estado 2</td>
-                <td>Cidade 1, Cidade 2</td>
-                <td>Bairro 1, Bairro 2</td>
-                <td>
-                    <button class="btn btn-warning btn-sm">Alterar</button>
-                    <button class="btn btn-danger btn-sm">Eliminar</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Nome Exemplo 2</td>
-                <td>09:00:00</td>
-                <td>18:00:00</td>
-                <td>3</td>
-                <td>4</td>
-                <td>Estado 3, Estado 4</td>
-                <td>Cidade 3, Cidade 4</td>
-                <td>Bairro 3, Bairro 4</td>
-                <td>
-                    <button class="btn btn-warning btn-sm">Alterar</button>
-                    <button class="btn btn-danger btn-sm">Eliminar</button>
-                </td>
-            </tr>
-            <!-- Adicione mais linhas conforme necessário -->
+            @foreach ($lojas as $loja)
+                <tr>
+                    <td>{{$loja->nome}}</td>
+                    <td>{{$loja->horario_inicio}}</td>
+                    <td>{{$loja->horario_fim}}</td>
+                    <td>{{$loja->tipo->tipo}}</td>
+                    <td>{{$loja->categoria->categoria}}</td>
+                    <td>Estado 1, Estado 2</td>
+                    <td>Cidade 1, Cidade 2</td>
+                    <td>Bairro 1, Bairro 2</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm">Alterar</button>
+                        <button class="btn btn-danger btn-sm">Eliminar</button>
+                    </td>
+                </tr>
+            @endforeach
         </tbody>
     </table>
 
@@ -117,7 +105,7 @@
 
 <script>
     // Script para filtragem
-    document.getElementById('searchInput').addEventListener('keyup', function() {
+    document.getElementById('searchInput').addEventListener('keyup', function () {
         const filter = this.value.toLowerCase();
         const rows = document.querySelectorAll('#dataTable tbody tr');
         let hasResults = false;

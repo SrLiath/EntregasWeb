@@ -9,9 +9,9 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
-        crossorigin="anonymous"></script>
+        </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/css/templatemo-style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
@@ -42,6 +42,60 @@
         data-image-src="img/hero.jpg">
         <div class="container">
             <style>
+                .btn-location {
+                    margin: 5px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    padding: 8px 16px;
+                    transition: all 0.3s ease;
+                    border: 2px solid #e0e0e0;
+                    background-color: white;
+                    color: #333;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .btn-location:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+
+                .btn-location.active {
+                    background-color: #4CAF50;
+                    color: white;
+                    border-color: #4CAF50;
+                    padding-left: 30px;
+                }
+
+                .btn-location.active::before {
+                    content: '\f00c';
+                    font-family: 'Font Awesome 5 Free';
+                    font-weight: 900;
+                    position: absolute;
+                    left: 10px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                }
+
+                #selectedLocations {
+                    font-size: 14px;
+                    color: #6c757d;
+                    background-color: #f8f9fa;
+                    border-radius: 10px;
+                    padding: 10px;
+                    margin-top: 10px;
+                }
+
+                h2,
+                h3 {
+                    color: #333;
+                    font-weight: 600;
+                }
+
+                .section {
+                    margin-bottom: 20px;
+                }
+
                 .plans-container {
                     display: flex;
                     justify-content: center;
@@ -52,7 +106,7 @@
                 .plan {
                     background-color: rgba(255, 255, 255, 0.9);
                     border-radius: 15px;
-                    margin: 10px;
+                    margin: 21px;
                     padding: 20px;
                     text-align: center;
                     width: 30%;
@@ -104,25 +158,80 @@
                         /* Reduz o tamanho do texto em telas pequenas */
                     }
                 }
+
+                .custom-checkbox {
+                    display: inline-block;
+                    position: relative;
+                    padding-left: 35px;
+                    margin-bottom: 12px;
+                    cursor: pointer;
+                    font-size: 18px;
+                    user-select: none;
+                }
+
+                .custom-checkbox input {
+                    position: absolute;
+                    opacity: 0;
+                    cursor: pointer;
+                    height: 0;
+                    width: 0;
+                }
+
+                .checkmark {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    height: 25px;
+                    width: 25px;
+                    background-color: #eee;
+                    border-radius: 5px;
+                    transition: all 0.3s ease;
+                }
+
+                .custom-checkbox:hover input~.checkmark {
+                    background-color: #ccc;
+                }
+
+                .custom-checkbox input:checked~.checkmark {
+                    background-color: #2196F3;
+                }
+
+                .checkmark:after {
+                    content: "\f00c";
+                    font-family: "Font Awesome 6 Free";
+                    font-weight: 900;
+                    position: absolute;
+                    display: none;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    color: white;
+                }
+
+                .custom-checkbox input:checked~.checkmark:after {
+                    display: block;
+                }
+
+                .custom-checkbox input:checked~.checkmark {
+                    animation: rubberBand 0.8s;
+                }
             </style>
             <br>
             <center>
                 <h3>Escolha um plano</h3>
             </center>
             <div class="plans-container">
-                <div class="plan selected" onclick="selectPlan(this, 'Plano Brasil')">
-                    <h2>Plano Brasil</h2>
-                    <p>1 banner no Brasil (index) e em todos os estados<br>+ resultado da busca <br>+ página do
-                        anunciante</p>
-                </div>
-                <div class="plan" onclick="selectPlan(this, 'Plano Estadual')">
-                    <h2>Plano Estadual</h2>
-                    <p>1 banner no estado<br>+ resultado da busca <br>+ página do anunciante</p>
-                </div>
-                <div class="plan" onclick="selectPlan(this, 'Plano Busca')">
-                    <h2>Plano Busca</h2>
-                    <p>+ página do anunciante</p>
-                </div>
+                @foreach ($planos as $p)
+
+                    <div class="plan selected" onclick="selectPlan(this, 'Plano Brasil')">
+                        <h2>{{$p->nome}}</h2>
+                        <h3>
+                            {{ ($p->valor == floor($p->valor)) ? intval($p->valor) : $p->valor }}R$
+                        </h3>
+
+                        <p>{!! $p->descricao !!}</p>
+                    </div>
+                @endforeach
             </div>
             <script>
                 let selectedPlanValue = 'Plano Brasil'; // Inicializa com o plano pré-selecionado
@@ -140,7 +249,7 @@
             <!-- Incluindo a biblioteca do Font Awesome -->
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-            <form class="tm-search-form row" id="formcadastro">
+            <div class="tm-search-form row" id="formcadastro">
                 <input type="hidden" class="form-control hidden" id="plano" value="Plano Brasil" required>
                 <!-- Responsável -->
                 <div class="col-12 col-md-4 mb-2">
@@ -220,8 +329,7 @@
                     <label for="link-instagram">Link para o Instagram</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fab fa-instagram"></i></span>
-                        <input type="url" class="form-control" id="link-instagram"
-                            placeholder="LINK PRO INSTAGRAM ">
+                        <input type="url" class="form-control" id="link-instagram" placeholder="LINK PRO INSTAGRAM ">
                     </div>
                 </div>
 
@@ -229,8 +337,7 @@
                     <label for="link-facebook">Link para o Facebook</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fab fa-facebook"></i></span>
-                        <input type="url" class="form-control" id="link-facebook"
-                            placeholder="LINK PRO FACEBOOK ">
+                        <input type="url" class="form-control" id="link-facebook" placeholder="LINK PRO FACEBOOK ">
                     </div>
                 </div>
 
@@ -241,7 +348,28 @@
                         <input type="tel" class="form-control" id="whatsapp" placeholder="WHATSAPP">
                     </div>
                 </div>
+                <script>
+                    $('#whatsapp').on('input', function () {
+                        var input = $(this).val();
 
+                        // Remove qualquer caractere que não seja número
+                        input = input.replace(/\D/g, '');
+
+                        // Formata o número para o formato (xx) xxxxx-xxxx
+                        if (input.length > 10) {
+                            input = input.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                        } else if (input.length > 6) {
+                            input = input.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+                        } else if (input.length > 2) {
+                            input = input.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+                        } else {
+                            input = input.replace(/^(\d*)/, '($1');
+                        }
+
+                        // Atualiza o valor do campo de entrada
+                        $(this).val(input);
+                    });
+                </script>
                 <div class="col-12 col-md-4 mb-2">
                     <label for="telefone-2">Telefone Alternativo</label>
                     <div class="input-group">
@@ -254,8 +382,8 @@
                     <label for="horario-abertura">Horário de Abertura</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-clock"></i></span>
-                        <input type="time" class="form-control" id="horario-abertura"
-                            placeholder="Horário de Abertura" required>
+                        <input type="time" class="form-control" id="horario-abertura" placeholder="Horário de Abertura"
+                            required>
                     </div>
                 </div>
 
@@ -268,55 +396,164 @@
                     </div>
                 </div>
 
+                <div class="col-12 col-md-4 mb-2">
+                    <label class="form-label">Dias trabalhados e feriados</label>
+                    <div class="dias-container">
+                        <input type="checkbox" id="dia1" name="dias-trabalhados" value="1" class="dia-checkbox">
+                        <label for="dia1" class="dia-label" title="Segunda-feira">
+                            <i class="fas fa-calendar-day"></i>
+                            <span class="dia-nome">Seg</span>
+                        </label>
+
+                        <input type="checkbox" id="dia2" name="dias-trabalhados" value="2" class="dia-checkbox">
+                        <label for="dia2" class="dia-label" title="Terça-feira">
+                            <i class="fas fa-calendar-day"></i>
+                            <span class="dia-nome">Ter</span>
+                        </label>
+
+                        <input type="checkbox" id="dia3" name="dias-trabalhados" value="3" class="dia-checkbox">
+                        <label for="dia3" class="dia-label" title="Quarta-feira">
+                            <i class="fas fa-calendar-day"></i>
+                            <span class="dia-nome">Qua</span>
+                        </label>
+
+                        <input type="checkbox" id="dia4" name="dias-trabalhados" value="4" class="dia-checkbox">
+                        <label for="dia4" class="dia-label" title="Quinta-feira">
+                            <i class="fas fa-calendar-day"></i>
+                            <span class="dia-nome">Qui</span>
+                        </label>
+
+                        <input type="checkbox" id="dia5" name="dias-trabalhados" value="5" class="dia-checkbox">
+                        <label for="dia5" class="dia-label" title="Sexta-feira">
+                            <i class="fas fa-calendar-day"></i>
+                            <span class="dia-nome">Sex</span>
+                        </label>
+
+                        <input type="checkbox" id="dia6" name="dias-trabalhados" value="6" class="dia-checkbox">
+                        <label for="dia6" class="dia-label" title="Sábado">
+                            <i class="fas fa-calendar-day"></i>
+                            <span class="dia-nome">Sáb</span>
+                        </label>
+
+                        <input type="checkbox" id="dia7" name="dias-trabalhados" value="7" class="dia-checkbox">
+                        <label for="dia7" class="dia-label" title="Domingo">
+                            <i class="fas fa-calendar-day"></i>
+                            <span class="dia-nome">Dom</span>
+                        </label>
+
+                        <input type="checkbox" id="dia8" name="dias-trabalhados" value="8" class="dia-checkbox">
+                        <label for="dia8" class="dia-label feriado-label" title="Feriados">
+                            <i class="fas fa-star"></i>
+                            <span class="dia-nome">Feriado</span>
+                        </label>
+                    </div>
+                </div>
+
+                <style>
+                    .dias-container {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 5px;
+                    }
+
+                    .dia-checkbox {
+                        display: none;
+                    }
+
+                    .dia-label {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 40px;
+                        height: 40px;
+                        border: 1px solid #ced4da;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        font-size: 0.8rem;
+                    }
+
+                    .dia-label:hover {
+                        background-color: #f8f9fa;
+                    }
+
+                    .dia-checkbox:checked+.dia-label {
+                        background-color: #007bff;
+                        color: white;
+                        border-color: #007bff;
+                    }
+
+                    .dia-nome {
+                        font-size: 0.7rem;
+                        margin-top: 2px;
+                    }
+
+                    .feriado-label {
+                        background-color: white;
+                        border-color: #ffc107;
+                        width: 20%;
+                        border-radius: 27px;
+                    }
+
+                    .feriado-label:hover {
+                        background-color: #ffca2c;
+                    }
+
+                    .dia-checkbox:checked+.feriado-label {
+                        background-color: #ff9800;
+                        border-color: #ff9800;
+                    }
+
+                    @media (max-width: 768px) {
+                        .dia-label {
+                            width: 35px;
+                            height: 35px;
+                        }
+                    }
+                </style>
                 <!-- Entregas -->
-                <div class="col-12 mb-2">
-                    <h5>Regiões de Entrega</h5>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="entrego-todo-brasil"
-                            onclick="updateCheckboxes(this)">
-                        <label class="form-check-label" for="entrego-todo-brasil">Entrego em todo Brasil</label>
+                <div class="container">
+                    <h2 class="mb-4 text-center">Locais de atuação</h2>
+
+                    <div class="section">
+                        <h3 class="mb-3">Estados</h3>
+                        <label class="custom-checkbox">
+                            Entrego em todo o Brasil
+                            <input type="checkbox" id="allest">
+                            <span class="checkmark"></span>
+                        </label>
+                        <div id="estadosContainer" class="d-flex flex-wrap justify-content-center"></div>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="entrego-todo-estado"
-                            onclick="updateCheckboxes(this)">
-                        <label class="form-check-label" for="entrego-todo-estado">Entrego em todo o estado</label>
-                        <select id="estado" class="form-control mt-2" aria-label="Estado" style="display:none;">
-                            <option value="">Estado</option>
-                            <option value="SP">São Paulo</option>
-                            <option value="RJ">Rio de Janeiro</option>
-                            <option value="MG">Minas Gerais</option>
-                            <!-- Adicione outros estados conforme necessário -->
-                        </select>
+
+                    <div class="section cidadesDiv">
+                        <label class="custom-checkbox">
+                            Entrego em todas as cidades
+                            <input type="checkbox" id="allcid">
+                            <span class="checkmark"></span>
+                        </label>
+                        <h3 class="mb-3">Cidades</h3>
+                        <div id="cidadesContainer" class="d-flex flex-wrap justify-content-center"></div>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="entrego-todo-cidade"
-                            onclick="updateCheckboxes(this)">
-                        <label class="form-check-label" for="entrego-todo-cidade">Entrego em toda cidade</label>
-                        <select id="estado-cidade" class="form-control mt-2" aria-label="Estado"
-                            style="display:none;">
-                            <option value="">Estado</option>
-                            <option value="SP">São Paulo</option>
-                            <option value="RJ">Rio de Janeiro</option>
-                            <option value="MG">Minas Gerais</option>
-                            <!-- Adicione outros estados conforme necessário -->
-                        </select>
-                        <select id="cidade" class="form-control mt-2" aria-label="Cidade" style="display:none;">
-                            <option value="">Cidade</option>
-                            <option value="SP">São Paulo</option>
-                            <option value="RJ">Rio de Janeiro</option>
-                            <option value="BH">Belo Horizonte</option>
-                            <!-- Adicione outras cidades conforme necessário -->
-                        </select>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="entrego-especifico"
-                            onclick="updateCheckboxes(this)">
-                        <label class="form-check-label" for="entrego-especifico">Entrego em regiões
-                            específicas</label>
-                        <div id="locais-especificos" style="display:none;">
-                            <input type="text" class="form-control mt-2" placeholder="Especifique os locais">
+
+                    <div class="bairrosdiv">
+
+                        <div class="section ">
+                            <label class="custom-checkbox">
+                                Entrego em todos os bairros
+                                <input type="checkbox" id="allbai">
+                                <span class="checkmark"></span>
+                            </label>
+                            <h3 class="mb-3">Bairros</h3>
+                            <div id="bairrosContainer" class="d-flex flex-wrap justify-content-center"></div>
+                            <div class="mt-3">
+                                <input type="text" id="novoBairro" class="form-control"
+                                    placeholder="Adicionar novo bairro">
+                                <button id="adicionarBairro" class="btn btn-primary mt-2">Adicionar Bairro</button>
+                            </div>
                         </div>
                     </div>
+
                 </div>
                 <div class="col-12 mb-2">
                     <div class="g-recaptcha" data-sitekey="6LexI14qAAAAAA3joWVkVxqhe-dlSeEN5uKoinXb"></div>
@@ -328,7 +565,7 @@
                         <i class="fas fa-check"></i> Confirmar
                     </button>
                 </div>
-            </form>
+            </div>
 
             <script>
                 function onSubmit(token) {
@@ -347,34 +584,6 @@
                     // Atualizar a visibilidade dos selects
                     updateVisibility();
                 }
-
-                function updateVisibility() {
-                    const brasil = document.getElementById('entrego-todo-brasil').checked;
-                    const estado = document.getElementById('entrego-todo-estado').checked;
-                    const cidade = document.getElementById('entrego-todo-cidade').checked;
-
-                    // Oculta todos os selects inicialmente
-                    document.getElementById('estado').style.display = 'none';
-                    document.getElementById('estado-cidade').style.display = 'none';
-                    document.getElementById('cidade').style.display = 'none';
-                    document.getElementById('locais-especificos').style.display = 'none';
-
-                    // Mostra select de estado se 'entrego em todo estado' for selecionado
-                    if (estado) {
-                        document.getElementById('estado').style.display = 'block';
-                    }
-
-                    // Mostra selects de estado e cidade se 'entrego em toda cidade' for selecionado
-                    if (cidade) {
-                        document.getElementById('estado-cidade').style.display = 'block';
-                        document.getElementById('cidade').style.display = 'block';
-                    }
-
-                    // Mostra locais específicos se selecionado
-                    if (document.getElementById('entrego-especifico').checked) {
-                        document.getElementById('locais-especificos').style.display = 'block';
-                    }
-                }
             </script>
 
         </div>
@@ -382,116 +591,194 @@
 
 
     <script>
-        $(document).ready(function() {
-            // Função para carregar os estados
+        $(document).ready(function () {
+            var estados = [];
+            var cidades = {};
+            var bairros = [];
+
+            $('#allest').change(function () {
+                const isChecked = $(this).is(':checked');
+                if (isChecked) {
+                    $('.bairrosdiv').hide();
+                    $('.btn-location[data-type="estado"]').addClass('active');
+                    $('.cidadesDiv').hide();
+                    $('#cidadesContainer').empty();
+                    $('#bairrosContainer').empty();
+                } else {
+                    $('.cidadesDiv').show();
+                    $('.bairrosdiv').show();
+                    $('.btn-location[data-type="estado"]').removeClass('active');
+                    $('#cidadesContainer').empty();
+                    $('#bairrosContainer').empty();
+                }
+                updateSelectedLocations();
+            });
+
+            $('#allcid').change(function () {
+                const isChecked = $(this).is(':checked');
+                if (isChecked) {
+                    $('.bairrosdiv').hide();
+                    $('.btn-location[data-type="cidade"]').addClass('active');
+                    $('#bairrosContainer').empty();
+                } else {
+                    $('.bairrosdiv').show();
+                    $('.btn-location[data-type="cidade"]').removeClass('active');
+                    $('#bairrosContainer').empty();
+
+                }
+                updateSelectedLocations();
+            });
+
+            $('#allbai').change(function () {
+                const isChecked = $(this).is(':checked');
+                if (isChecked) {
+                    $('.btn-location[data-type="bairro"]').addClass('active');
+                } else {
+                    $('.btn-location[data-type="bairro"]').removeClass('active');
+                }
+                updateSelectedLocations();
+            });
+
+            const estadosContainer = $('#estadosContainer');
+            const cidadesContainer = $('#cidadesContainer');
+            const bairrosContainer = $('#bairrosContainer');
+            const selectedLocations = $('#selectedLocations');
+
+            function createButton(id, text, container, type) {
+                const button = $('<button>')
+                    .addClass('btn btn-location')
+                    .attr('data-id', id)
+                    .attr('data-type', type)
+                    .text(text)
+                    .click(function () {
+                        $(this).toggleClass('active');
+                        updateSelectedLocations();
+
+                        // Carregar cidades se o tipo for 'estado'
+                        if (type === 'estado') {
+                            // Verifica se o botão está ativo ou não
+                            if ($(this).hasClass('active')) {
+                                carregarCidades(id); // Carrega cidades do estado selecionado
+                            } else {
+                                // Se o estado foi desmarcado, remove as cidades correspondentes
+                                removerCidades(id);
+                            }
+                        }
+                    });
+                container.append(button);
+                return button;
+            }
+
+            function updateSelectedLocations() {
+                estados = [];
+                cidades = {};
+                bairros = [];
+
+                // Adiciona estados selecionados
+                $('.btn-location[data-type="estado"].active').each(function () {
+                    const estadoId = $(this).attr('data-id');
+                    estados.push($(this).attr('data-id'));
+                    cidades[estadoId] = []; // Inicializa o array para as cidades desse estado
+                });
+
+                // Adiciona cidades selecionadas
+                $('.btn-location[data-type="cidade"].active').each(function () {
+                    const cidadeId = $(this).attr('data-id');
+                    const estadoId = $(this).data('estado-id'); // Acessa o ID do estado relacionado
+                    if (estadoId) {
+                        cidades[estadoId].push($(this)
+                            .attr('data-id')); // Adiciona a cidade ao estado correspondente
+                    }
+                });
+
+                // Adiciona bairros selecionados
+                $('.btn-location[data-type="bairro"].active').each(function () {
+                    bairros.push($(this).attr('data-id'));
+                });
+
+                // Atualiza a exibição das localizações selecionadas
+                selectedLocations.text(
+                    `Estados: ${estados.join(', ')}, Cidades: ${Object.entries(cidades).map(([key, val]) => `${key}: ${val.join(', ')}`).join('; ')}, Bairros: ${bairros.join(', ')}`
+                );
+            }
 
             function carregarEstados() {
                 $.post('/api/estados')
-                    .done(function(data) {
-                        data.forEach(function(val) {
-                            $('#estado').append('<option value="' + val.id_estado + '">' + val.nome +
-                                '</option>');
+                    .done(function (data) {
+                        estadosContainer.empty();
+                        data.forEach(function (val) {
+                            createButton(val.id_estado, val.nome, estadosContainer, 'estado');
                         });
                     })
-                    .fail(function(xhr, status, error) {
+                    .fail(function (xhr, status, error) {
                         console.error('Erro ao carregar estados:', status, error);
-                        console.log('Erro ao carregar estados: ' + xhr.responseText);
                     });
             }
 
-            // Função para carregar as cidades com base no estado
             function carregarCidades(estadoId) {
                 if (estadoId) {
                     $.post('/api/cidades', {
-                            estado: estadoId
-                        })
-                        .done(function(data) {
-                            $('#cidade').empty().append('<option value="">Selecione a Cidade</option>');
-                            data.forEach(function(val) {
-                                $('#cidade').append('<option value="' + val.id_cidade + '">' + val
-                                    .nome + '</option>');
+                        estado: estadoId
+                    })
+                        .done(function (data) {
+                            // Verifica se as cidades já foram carregadas
+                            if (!cidades[estadoId]) {
+                                cidades[estadoId] = []; // Inicializa o array para as cidades desse estado
+                            }
+                            data.forEach(function (val) {
+                                createButton(val.id_cidade, val.nome, cidadesContainer, 'cidade')
+                                    .attr('data-estado-id',
+                                        estadoId); // Adiciona o ID do estado à cidade
                             });
-                            $('#cidade').prop('disabled', false);
                         })
-                        .fail(function(xhr, status, error) {
+                        .fail(function (xhr, status, error) {
                             console.error('Erro ao carregar cidades:', status, error);
-                            console.log('Erro ao carregar cidades: ' + xhr.responseText);
                         });
-                } else {
-                    $('#cidade').empty().append('<option value="">Selecione a Cidade</option>').prop('disabled',
-                        true);
                 }
             }
 
-            // Função para carregar bairros a partir do ID do município
+            function removerCidades(estadoId) {
+                // Remove as cidades relacionadas ao estado que foi desmarcado
+                cidadesContainer.find(`.btn-location[data-estado-id="${estadoId}"]`)
+                    .remove(); // Remove as cidades correspondentes
+                updateSelectedLocations(); // Atualiza as localizações selecionadas
+            }
+
             function carregarBairros(cidadeId) {
                 if (cidadeId) {
                     $.post('/api/bairros', {
-                            cidade: cidadeId
-                        })
-                        .done(function(data) {
-                            $('#bairro').empty().append('<option value="">Selecione o Bairro</option>');
-                            data.forEach(function(val) {
-                                $('#bairro').append('<option value="' + val.id_bairro + '">' + val
-                                    .nome + '</option>');
+                        cidade: cidadeId
+                    })
+                        .done(function (data) {
+                            bairrosContainer.empty();
+                            data.forEach(function (val) {
+                                createButton(val.id_bairro, val.nome, bairrosContainer, 'bairro');
                             });
-                            $('#bairro').prop('disabled', false);
                         })
-                        .fail(function(xhr, status, error) {
+                        .fail(function (xhr, status, error) {
                             console.error('Erro ao carregar bairros:', status, error);
-                            console.log('Erro ao carregar bairros: ' + xhr.responseText);
-                            $('#bairro').empty().append('<option value="">Nenhum bairro encontrado</option>')
-                                .prop('disabled', true);
                         });
                 } else {
-                    $('#bairro').empty().append('<option value="">Selecione o Bairro</option>').prop('disabled',
-                        true);
+                    bairrosContainer.empty();
                 }
             }
 
-            // Mapeamento de categorias com base no tipo
-            const categoriasPorTipo = {
-                residencial: [{
-                        valor: "venda",
-                        texto: "Venda Residencial"
-                    },
-                    {
-                        valor: "aluguel",
-                        texto: "Aluguel Residencial"
-                    }
-                ],
-                comercial: [{
-                        valor: "venda",
-                        texto: "Venda Comercial"
-                    },
-                    {
-                        valor: "aluguel",
-                        texto: "Aluguel Comercial"
-                    }
-                ]
-            };
+            $('#adicionarBairro').click(function () {
+                const novoBairro = $('#novoBairro').val().trim();
+                if (novoBairro) {
+                    createButton('novo_' + Date.now(), novoBairro, bairrosContainer, 'bairro');
+                    $('#novoBairro').val('');
+                }
+            });
 
-            // Carregar os estados
             carregarEstados();
 
-            // Evento para carregar cidades quando o estado for selecionado
-            $('#estado').on('change', function() {
-                let estadoId = $(this).val();
-                carregarCidades(estadoId);
-            });
-
-            // Evento para carregar bairros quando a cidade for selecionada
-            $('#cidade').on('change', function() {
-                let cidadeId = $(this).val();
-                carregarBairros(cidadeId);
-            });
-
             // Evento para carregar categorias quando o tipo for selecionado
-            $('#tipo').on('change', function() {
+            $('#tipo').on('change', function () {
                 let tipoSelecionado = $(this).val();
                 $('#categoria').empty().append('<option value="">Selecione a Categoria</option>');
                 if (tipoSelecionado && categoriasPorTipo[tipoSelecionado]) {
-                    categoriasPorTipo[tipoSelecionado].forEach(function(categoria) {
+                    categoriasPorTipo[tipoSelecionado].forEach(function (categoria) {
                         $('#categoria').append('<option value="' + categoria.valor + '">' +
                             categoria.texto + '</option>');
                     });
@@ -502,7 +789,7 @@
             });
 
             // Ação ao clicar no botão Confirmar
-            $('#btn-search').on('click', function() {
+            $('#btn-search').on('click', function () {
                 // Obtém os valores selecionados
                 let estado = $('#estado').find('option:selected').text();
                 let cidade = $('#cidade').find('option:selected').text();
@@ -570,7 +857,7 @@
     </footer>
 
     <script>
-        $(window).on("load", function() {
+        $(window).on("load", function () {
             $('body').addClass('loaded');
         });
     </script>

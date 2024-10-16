@@ -1,4 +1,5 @@
-<div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll" data-image-src="img/hero.jpg">
+<div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll"
+    data-image-src="img/hero.jpg">
     <div class="container">
         <!-- Banner -->
         <div class="container-fluid p-0">
@@ -28,7 +29,7 @@
 
             <!-- Bairro como input -->
             <div class="col-12 col-md-2 mb-2">
-                <input id="bairro" type="text" class="form-control" aria-label="Bairro" placeholder="Bairro">
+                <input id="inputbairro" type="text" class="form-control" aria-label="Bairro" placeholder="Bairro">
             </div>
 
             <!-- Botão de Confirmar -->
@@ -42,17 +43,17 @@
 </div>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         // Função para carregar os estados
         function carregarEstados() {
             $.post('/api/estados')
-                .done(function(data) {
-                    data.forEach(function(val) {
+                .done(function (data) {
+                    data.forEach(function (val) {
                         $('#estado').append('<option value="' + val.id_estado + '">' + val.nome +
                             '</option>');
                     });
                 })
-                .fail(function(xhr, status, error) {
+                .fail(function (xhr, status, error) {
                     console.error('Erro ao carregar estados:', status, error);
                 });
         }
@@ -61,17 +62,17 @@
         function carregarCidades(estadoId) {
             if (estadoId) {
                 $.post('/api/cidades', {
-                        estado: estadoId
-                    })
-                    .done(function(data) {
+                    estado: estadoId
+                })
+                    .done(function (data) {
                         $('#cidade').empty().append('<option value="">Selecione a Cidade</option>');
-                        data.forEach(function(val) {
+                        data.forEach(function (val) {
                             $('#cidade').append('<option value="' + val.id_cidade + '">' + val
                                 .nome + '</option>');
                         });
                         $('#cidade').prop('disabled', false);
                     })
-                    .fail(function(xhr, status, error) {
+                    .fail(function (xhr, status, error) {
                         console.error('Erro ao carregar cidades:', status, error);
                     });
             } else {
@@ -90,31 +91,49 @@
         carregarEstados();
 
         // Evento para carregar cidades quando o estado for selecionado
-        $('#estado').on('change', function() {
+        $('#estado').on('change', function () {
             let estadoId = $(this).val();
             carregarCidades(estadoId);
         });
 
-        $('#btn-search').on('click', function() {
+        $('#btn-search').on('click', function () {
             // Obtém os valores selecionados
-            let estado = $('#estado').val();
             let cidade = $('#cidade').val();
-            let bairro = $('#bairro').val();
-
+            let bairro = $('#inputbairro').val();
+            alert(bairro)
             // Validação
-            if (!estado || !cidade) {
+            if (!cidade) {
                 Swal.fire({
                     title: 'Erro!',
-                    text: 'Informe o estado e a cidade!',
+                    text: 'Informe o estado e a cidade para adicionar um bairro!',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });
                 return; // Para a execução se a validação falhar
             }
-
+            $.ajax({
+                url: '/api/bairros/store',
+                type: 'POST',
+                data: {
+                    nome: bairro,
+                    cidade: cidade
+                },
+                success: function (response) {
+                    Swal.fire({
+                        title: 'Adicionado',
+                        text: 'Estado adicionado com sucesso!',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                },
+                error: function (xhr) {
+                    // Exibe erro no console
+                    console.error('Erro ao buscar categorias:', xhr.responseText);
+                }
+            });
         });
         // Evento para habilitar o input de bairro quando a cidade for selecionada
-        $('#cidade').on('change', function() {
+        $('#cidade').on('change', function () {
             let cidadeId = $(this).val();
             if (cidadeId) {
                 habilitarInputBairro(); // Habilita o input de bairro se uma cidade for selecionada
