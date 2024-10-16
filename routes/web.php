@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
 use App\Models\Loja;
 use App\Models\Estado;
@@ -12,7 +13,8 @@ use App\Http\Controllers\PaymentGateway;
 use App\Http\Middleware\CheckAdmin;
 Route::middleware([CheckAdmin::class])->group(function () {
     Route::get('/xxmigadmin', function () {
-        return view('admin.admin');
+        $tipos = Tipo::all();
+        return view('admin.admin', ['tipos' => $tipos]);
     });
 });
 
@@ -135,3 +137,11 @@ Route::post('/api/cidades/store', [LocalidadesController::class, 'storeCidade'])
 // Rotas para Bairros
 Route::post('/api/bairros', [LocalidadesController::class, 'bairros']);
 Route::post('/api/bairros/store', [LocalidadesController::class, 'storeBairro']);
+Route::post('/tipos', [Controller::class, 'Tipostore']);
+
+// Rota para deletar um tipo pelo ID
+Route::delete('/tipos/{id}', [Controller::class, 'Tipodestroy']);
+Route::post('/tipos/categorias', [Controller::class, 'getCategorias']);
+
+Route::post('/tipos/categorias/add', [Controller::class, 'addCategoria']);
+Route::delete('/tipos/categorias/{id}', [Controller::class, 'destroyCategoria']);

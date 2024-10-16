@@ -90,7 +90,7 @@
                     success: function(response) {
                         // Redireciona ou executa qualquer lógica após o login bem-sucedido
                         console.log(response)
-                        window.location.href = '/admin'; // Redireciona para a área admin
+                        window.location.href = '/xxmigadmin'; // Redireciona para a área admin
                     },
                     error: function(xhr) {
                         // Limpa qualquer alerta anterior

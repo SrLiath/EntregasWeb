@@ -71,13 +71,13 @@
     </div>
 
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-            $('#loginconfirm').click(function (e) {
+            $('#loginconfirm').click(function(e) {
                 e.preventDefault(); // Impede o envio padrão do formulário
 
                 var formData = {
@@ -89,17 +89,17 @@
                     type: 'POST',
                     url: "{{ route('admin.login.validate') }}", // Rota de validação
                     data: formData,
-                    success: function (response) {
+                    success: function(response) {
                         // Redireciona ou executa qualquer lógica após o login bem-sucedido
                         console.log(response)
-                        window.location.href = '/admin'; // Redireciona para a área admin
+                        window.location.href = '/xxmigadmin'; // Redireciona para a área admin
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         // Limpa qualquer alerta anterior
                         if (xhr.status === 422) { // Erro de validação
                             var errors = xhr.responseJSON.errors;
                             var errorMessages = '';
-                            $.each(errors, function (key, value) {
+                            $.each(errors, function(key, value) {
                                 errorMessages += value.join('<br>') + '<br>';
                             });
 
