@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Loja;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Tipo;
@@ -102,4 +103,119 @@ class Controller
         return response()->json(['message' => 'Plano atualizado com sucesso.', 'plano' => $plano], 200);
     }
 
+    public function adicionarCategoria(Request $request)
+    {
+        $request->validate([
+            'nome' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        $idLoja = $user->lojaId;
+        $loja = Loja::where('id', $idLoja)->first();
+
+        $produtos = json_decode($loja->produtos, true);
+
+        // Verificar se a categoria já existe
+        foreach ($produtos['categorias'] as $categoria) {
+            if ($categoria['nome'] == $request->nome) {
+                return response()->json(['message' => 'Categoria já existe'], 400);
+            }
+        }
+
+        // Adicionar nova categoria
+        $produtos['categorias'][] = [
+            'nome' => $request->nome,
+            'produtos' => [],
+        ];
+
+        $loja->produtos = json_encode($produtos);
+        $loja->save();
+
+        return response()->json(['message' => 'Categoria adicionada com sucesso!'], 201);
+    }
+
+    // Deletar uma categoria existente
+    public function deletarCategoria($categoriaNome)
+    {
+        $user = Auth::user();
+        $idLoja = $user->lojaId;
+        $loja = Loja::where('id', $idLoja)->first();
+
+        $produtos = json_decode($loja->produtos, true);
+
+        // Filtrar e remover a categoria
+        $produtos['categorias'] = array_filter($produtos['categorias'], function($categoria) use ($categoriaNome) {
+            return $categoria['nome'] !== $categoriaNome;
+        });
+
+        $loja->produtos = json_encode($produtos);
+        $loja->save();
+
+        return response()->json(['message' => 'Categoria removida com sucesso!'], 200);
+    }
+
+    // Adicionar um produto a uma categoria
+    public function adicionarProduto(Request $request)
+    {
+        $request->validate([
+            'categoriaNome' => 'required|string',
+            'nome' => 'required|string',
+            'preco' => 'required|numeric',
+            'descricao' => 'required|string',
+            'foto' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $user = Auth::user();
+        $idLoja = $user->lojaId;
+        $loja = Loja::where('id', $idLoja)->first();
+
+        $produtos = json_decode($loja->produtos, true);
+
+        // Diretório onde a imagem será armazenada
+        $diretorio = 'public/' . $loja->url . '/produtos';
+        $caminhoImagem = $request->file('foto')->store($diretorio);
+
+        // Adicionar o novo produto na categoria correspondente
+        foreach ($produtos['categorias'] as &$categoria) {
+            if ($categoria['nome'] == $request->categoriaNome) {
+                $categoria['produtos'][] = [
+                    'nome' => $request->nome,
+                    'preco' => $request->preco,
+                    'descricao' => $request->descricao,
+                    'foto' => $caminhoImagem,
+                ];
+                break;
+            }
+        }
+
+        $loja->produtos = json_encode($produtos);
+        $loja->save();
+
+        return response()->json(['message' => 'Produto adicionado com sucesso!'], 201);
+    }
+
+    // Deletar um produto de uma categoria
+    public function deletarProduto($categoriaNome, $produtoNome)
+    {
+        $user = Auth::user();
+        $idLoja = $user->lojaId;
+        $loja = Loja::where('id', $idLoja)->first();
+
+        $produtos = json_decode($loja->produtos, true);
+
+        // Encontrar a categoria e remover o produto
+        foreach ($produtos['categorias'] as &$categoria) {
+            if ($categoria['nome'] == $categoriaNome) {
+                $categoria['produtos'] = array_filter($categoria['produtos'], function($produto) use ($produtoNome) {
+                    return $produto['nome'] !== $produtoNome;
+                });
+                break;
+            }
+        }
+
+        $loja->produtos = json_encode($produtos);
+        $loja->save();
+
+        return response()->json(['message' => 'Produto removido com sucesso!'], 200);
+    }
 }

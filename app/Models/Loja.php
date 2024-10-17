@@ -21,6 +21,7 @@ class Loja extends Model
         'estados_atendidos',
         'cidades_atendidas',
         'bairros_atendidos',
+        'produtos'
     ];
 
     protected $casts = [

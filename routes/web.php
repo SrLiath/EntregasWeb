@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\PedidoController;
+use App\Http\Middleware\LojaAdmin;
 use App\Models\Pedido;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
@@ -33,9 +34,74 @@ Route::middleware([CheckAdmin::class])->group(function () {
     Route::put('/api/planos/{id}', [Controller::class, 'updatePlanos']);
 });
 
+Route::middleware([LojaAdmin::class])->group(function () {
+    Route::post('/pedido/confirmar/{id}', [PedidoController::class, 'confirmar'])->name('pedido.confirmar');
+    Route::post('/pedido/negar/{id}', [PedidoController::class, 'negar'])->name('pedido.negar');
+    Route::post('/pedido/completar/{id}', [PedidoController::class, 'completar'])->name('pedido.completar');
+    Route::post('/lojas/categorias', [Controller::class, 'adicionarCategoria'])->name('lojas.adicionarCategoria');
+    Route::delete('/lojas/categorias/{categoriaNome}', [Controller::class, 'deletarCategoria'])->name('lojas.deletarCategoria');
+    Route::post('/lojas/produtos', [Controller::class, 'adicionarProduto'])->name('lojas.adicionarProduto');
+    Route::delete('/lojas/produtos/{categoriaNome}/{produtoNome}', [Controller::class, 'deletarProduto'])->name('lojas.deletarProduto');
+        Route::get('/loja', function () {
+        $user = Auth::user();
+
+        if ($user && $user->lojaId) {
+            $loja = Loja::find($user->lojaId);
+            if ($loja) {
+                return view('usuario.loja', ['loja' => $loja]);
+            } else {
+                return redirect()->back()->withErrors('Loja não encontrada.');
+            }
+        } else {
+            return redirect()->route('login'); // Redireciona para o login se não estiver autenticado
+        }
+    });
+
+    Route::get('/loja/pedidos', function () {
+        $pedidos = Pedido::paginate(16);
+        $today = Carbon::today();
+
+        // Contagem de pedidos por status
+        $totalHoje = Pedido::whereDate('data_pedido', $today)->count();
+        $completo = Pedido::whereDate('data_pedido', $today)->where('status', 'completo')->count();
+        $negado = Pedido::whereDate('data_pedido', $today)->where('status', 'negado')->count();
+        $andamento = Pedido::whereDate('data_pedido', $today)->where('status', 'andamento')->count();
+
+        // Passando as variáveis para a view
+        return view('usuario.pedidos', [
+            'pedidos' => $pedidos,
+            'totalHoje' => $totalHoje,
+            'completo' => $completo,
+            'negado' => $negado,
+            'andamento' => $andamento,
+            'loja',
+            'teste'
+        ]);
+    });
+    Route::get('/loja/categorias', function () {
+        $user = Auth::user();
+        $idLoja = $user->lojaId;
+        $produtos = Loja::where(['id' => $idLoja])->first();
+        return view('usuario.itens', ['produtos' => $produtos]);
+    });
+    Route::get('/loja/produtos', function () {
+        return view('usuario.produtos');
+    });
+
+    Route::get('/loja/dados', function () {
+        return view('usuario.dados');
+    });
+
+    Route::get('/loja/suporte', function () {
+        return view('usuario.suporte');
+    });
+
+});
+
 Route::get('/xxmigadmin/login', [AuthController::class, 'showLoginForm']);
 Route::post('/xxmigadmin/login', [AuthController::class, 'login'])->name('admin.login.validate');
-Route::post('/xxmigadmin/logout', [AuthController::class, 'logout'])->name('admin.logout');
+Route::get('/xxmigadmin/logout', [AuthController::class, 'logout'])->name('admin.logout');
+Route::get('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
 Route::get('/', function () {
     $lojas = Loja::paginate(16);
@@ -66,46 +132,6 @@ Route::get('/contato', function () {
 Route::get('/login', function () {
     return view('usuario.login');
 
-});
-Route::get('/loja', function () {
-    $loja = 'teste';
-    return view('usuario.loja', ['loja' => $loja]);
-});
-
-Route::get('/loja/pedidos', function () {
-    $pedidos = Pedido::paginate(16);
-    $today = Carbon::today();
-
-    // Contagem de pedidos por status
-    $totalHoje = Pedido::whereDate('data_pedido', $today)->count();
-    $completo = Pedido::whereDate('data_pedido', $today)->where('status', 'completo')->count();
-    $negado = Pedido::whereDate('data_pedido', $today)->where('status', 'negado')->count();
-    $andamento = Pedido::whereDate('data_pedido', $today)->where('status', 'andamento')->count();
-
-    // Passando as variáveis para a view
-    return view('usuario.pedidos', [
-        'pedidos' => $pedidos,
-        'totalHoje' => $totalHoje,
-        'completo' => $completo,
-        'negado' => $negado,
-        'andamento' => $andamento,
-        'loja',
-        'teste'
-    ]);
-});
-Route::get('/loja/categorias', function () {
-    return view('usuario.itens');
-});
-Route::get('/loja/produtos', function () {
-    return view('usuario.produtos');
-});
-
-Route::get('/loja/dados', function () {
-    return view('usuario.dados');
-});
-
-Route::get('/loja/suporte', function () {
-    return view('usuario.suporte');
 });
 
 Route::get('/{estado}', function ($estado) {
@@ -172,8 +198,3 @@ Route::post('/api/cidades', [LocalidadesController::class, 'cidades']);
 Route::post('/api/bairros', [LocalidadesController::class, 'bairros']);
 // Rota para deletar um tipo pelo ID
 Route::post('/tipos/categorias', [Controller::class, 'getCategorias']);
-
-
-Route::post('/pedido/confirmar/{id}', [PedidoController::class, 'confirmar'])->name('pedido.confirmar');
-Route::post('/pedido/negar/{id}', [PedidoController::class, 'negar'])->name('pedido.negar');
-Route::post('/pedido/completar/{id}', [PedidoController::class, 'completar'])->name('pedido.completar');

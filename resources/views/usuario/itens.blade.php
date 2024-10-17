@@ -132,6 +132,7 @@
                     </label>
                     <span>Modo pasta</span>
                 </div>
+                <button class="btn btn-danger" id="DeleteCategory">Deletar Categoria</button>
                 <div>
                     <button id="addCategoryBtn" class="btn btn-primary me-2">
                         <i class="fas fa-plus"></i> Adicionar Categoria
@@ -251,191 +252,235 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
         <script>
-            $(document).ready(function () {
-                let categories = [];
-                let items = {};
-                let activeCategory = null;
+$(document).ready(function () {
+    let produtosData = {!! $produtos->produtos !!};
+    let categories = produtosData.categorias.map(categoria => categoria.nome);
+    let items = {};
 
-                function updateCategoryTabs() {
-                    $('#categoryTabs').empty();
-                    $('#categoryTabsContent').empty();
-                    $('#itemCategory').empty();
+    produtosData.categorias.forEach(categoria => {
+        items[categoria.nome] = categoria.produtos.map(produto => ({
+            name: produto.nome,
+            price: produto.preco,
+            description: produto.descricao,
+            image: produto.foto
+        }));
+    });
 
-                    categories.forEach((category, index) => {
-                        const isActive = category === activeCategory ? 'active' : '';
-                        $('#categoryTabs').append(`
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link ${isActive}" id="tab-${category}" data-bs-toggle="tab" 
-                                    data-bs-target="#content-${category}" type="button" role="tab">
-                                ${category}
-                            </button>
+    let activeCategory = null;
+
+    function updateCategoryTabs() {
+        $('#categoryTabs').empty();
+        $('#categoryTabsContent').empty();
+        $('#itemCategory').empty();
+
+        categories.forEach((category, index) => {
+            const isActive = category === activeCategory ? 'active' : '';
+            $('#categoryTabs').append(`
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link ${isActive}" id="tab-${category}" data-bs-toggle="tab" 
+                            data-bs-target="#content-${category}" type="button" role="tab">
+                        ${category}
+                    </button>
+                </li>
+            `);
+
+            $('#categoryTabsContent').append(`
+                <div class="tab-pane fade ${isActive ? 'show active' : ''}" id="content-${category}" role="tabpanel">
+                    <ul class="item-list" id="items-${category}"></ul>
+                </div>
+            `);
+
+            $('#itemCategory').append(`<option value="${category}">${category}</option>`);
+
+            if (items[category]) {
+                items[category].forEach((item, itemIndex) => {
+                    $(`#items-${category}`).append(`
+                        <li class="d-flex align-items-start">
+                            <img src="${item.image}" alt="${item.name}" class="item-image" data-category="${category}" data-index="${itemIndex}">
+                            <div>
+                                <strong>${item.name}</strong> - R$ ${item.price.toFixed(2)}
+                                <p>${item.description}</p>
+                            </div>
                         </li>
                     `);
-
-                        $('#categoryTabsContent').append(`
-                        <div class="tab-pane fade ${isActive ? 'show active' : ''}" id="content-${category}" role="tabpanel">
-                            <ul class="item-list" id="items-${category}"></ul>
-                        </div>
-                    `);
-
-                        $('#itemCategory').append(`<option value="${category}">${category}</option>`);
-
-                        if (items[category]) {
-                            items[category].forEach((item, itemIndex) => {
-                                $(`#items-${category}`).append(`
-                                <li class="d-flex align-items-start">
-                                    <img src="${item.image}" alt="${item.name}" class="item-image" data-category="${category}" data-index="${itemIndex}">
-                                    <div>
-                                        <strong>${item.name}</strong> - R$ ${item.price.toFixed(2)}
-                                        <p>${item.description}</p>
-                                    </div>
-                                </li>
-                            `);
-                            });
-                        }
-                    });
-
-                    $('.nav-link').on('click', function () {
-                        activeCategory = $(this).text().trim();
-                    });
-
-                    $('.item-image').on('click', function () {
-                        const category = $(this).data('category');
-                        const index = $(this).data('index');
-                        showItemDetails(category, index);
-                    });
-                }
-
-                function updateTreeView() {
-                    const treeData = categories.map(category => {
-                        return {
-                            text: category,
-                            children: items[category] ? items[category].map((item, index) => ({
-                                text: `${item.name} - R$ ${item.price.toFixed(2)}`,
-                                icon: item.image,
-                                data: { category, index }
-                            })) : []
-                        };
-                    });
-
-                    $('#treeView').jstree('destroy');
-                    $('#treeView').jstree({
-                        'core': {
-                            'data': treeData
-                        },
-                        'plugins': ['types'],
-                        'types': {
-                            'default': {
-                                'icon': 'fas fa-folder'
-                            }
-                        }
-                    }).on('select_node.jstree', function (e, data) {
-                        if (data.node.children.length === 0) {
-                            const { category, index } = data.node.original.data;
-                            showItemDetails(category, index);
-                        }
-                    });
-                }
-
-                function showItemDetails(category, index) {
-                    const item = items[category][index];
-                    $('#itemDetailsTitle').text(item.name);
-                    $('#itemDetailsCategory').text(category);
-                    $('#itemDetailsPrice').text(item.price.toFixed(2));
-                    $('#itemDetailsDescription').text(item.description);
-
-                    const carouselInner = $('#itemCarousel .carousel-inner');
-                    carouselInner.empty();
-
-                    items[category].forEach((carouselItem, carouselIndex) => {
-                        const activeClass = carouselIndex === index ? 'active' : '';
-                        carouselInner.append(`
-                        <div class="carousel-item ${activeClass}">
-                            <img src="${carouselItem.image}" class="d-block w-100 modal-image" alt="${carouselItem.name}">
-                        </div>
-                    `);
-                    });
-
-                    $('#itemDetailsModal').modal('show');
-                }
-
-                function updateView() {
-                    if ($('#viewModeSwitch').is(':checked')) {
-                        $('#tabView').hide();
-                        $('#treeView').show();
-                        updateTreeView();
-                    } else {
-                        $('#treeView').hide();
-                        $('#tabView').show();
-                        updateCategoryTabs();
-                    }
-                }
-
-                $('#viewModeSwitch').change(updateView);
-
-                $('#addCategoryBtn').click(function () {
-
-                    $('#addCategoryModal').modal('show');
                 });
+            }
+        });
 
-                $('#saveCategoryBtn').click(function () {
-                    const categoryName = $('#categoryName').val().trim();
-                    if (categoryName && !categories.includes(categoryName)) {
-                        categories.push(categoryName);
-                        items[categoryName] = [];
-                        activeCategory = categoryName;
-                        updateView();
-                        $('#addCategoryModal').modal('hide');
-                        $('#categoryName').val('');
-                        Swal.fire('Sucesso', 'Categoria adicionada com sucesso!', 'success');
-                    } else {
-                        Swal.fire('Erro', 'Nome de categoria inválido ou já existe!', 'error');
-                    }
-                });
+        $('.nav-link').on('click', function () {
+            activeCategory = $(this).text().trim();
+        });
 
-                $('#addItemBtn').click(function () {
-                    if (categories.length === 0) {
-                        Swal.fire('Erro', 'Adicione uma categoria primeiro!', 'error');
-                    } else {
-                        $('#itemCategory').val(activeCategory);
-                        $('#addItemModal').modal('show');
-                    }
-                });
+        $('.item-image').on('click', function () {
+            const category = $(this).data('category');
+            const index = $(this).data('index');
+            showItemDetails(category, index);
+        });
+    }
 
-                $('#saveItemBtn').click(function () {
-                    const category = $('#itemCategory').val();
-                    const itemName = $('#itemName').val().trim();
-                    const itemDescription = $('#itemDescription').val().trim();
-                    const itemPrice = parseFloat($('#itemPrice').val());
-                    const itemImageFile = $('#itemImage')[0].files[0];
+    function updateTreeView() {
+        const treeData = categories.map(category => {
+            return {
+                text: category,
+                children: items[category] ? items[category].map((item, index) => ({
+                    text: `${item.name} - R$ ${item.price.toFixed(2)}`,
+                    icon: item.image,
+                    data: { category, index }
+                })) : []
+            };
+        });
 
-                    if (category && itemName && itemDescription && !isNaN(itemPrice) && itemImageFile) {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            const newItem = {
-                                name: itemName,
-                                description: itemDescription,
-                                price: itemPrice,
-                                image: e.target.result
-                            };
-                            items[category].push(newItem);
-                            updateView();
-                            $('#addItemModal').modal('hide');
-                            $('#itemName').val('');
-                            $('#itemDescription').val('');
-                            $('#itemPrice').val('');
-                            $('#itemImage').val('');
-                            Swal.fire('Sucesso', 'Item adicionado com sucesso!', 'success');
-                        };
-                        reader.readAsDataURL(itemImageFile);
-                    } else {
-                        Swal.fire('Erro', 'Preencha todos os campos corretamente!', 'error');
-                    }
-                });
+        $('#treeView').jstree('destroy');
+        $('#treeView').jstree({
+            'core': {
+                'data': treeData
+            },
+            'plugins': ['types'],
+            'types': {
+                'default': {
+                    'icon': 'fas fa-folder'
+                }
+            }
+        }).on('select_node.jstree', function (e, data) {
+            if (data.node.children.length === 0) {
+                const { category, index } = data.node.original.data;
+                showItemDetails(category, index);
+            }
+        });
+    }
 
+    function showItemDetails(category, index) {
+        const item = items[category][index];
+        $('#itemDetailsTitle').text(item.name);
+        $('#itemDetailsCategory').text(category);
+        $('#itemDetailsPrice').text(item.price.toFixed(2));
+        $('#itemDetailsDescription').text(item.description);
+
+        const carouselInner = $('#itemCarousel .carousel-inner');
+        carouselInner.empty();
+
+        items[category].forEach((carouselItem, carouselIndex) => {
+            const activeClass = carouselIndex === index ? 'active' : '';
+            carouselInner.append(`
+                <div class="carousel-item ${activeClass}">
+                    <img src="${carouselItem.image}" class="d-block w-100 modal-image" alt="${carouselItem.name}">
+                </div>
+            `);
+        });
+
+        $('#itemDetailsModal').modal('show');
+    }
+
+    function updateView() {
+        if ($('#viewModeSwitch').is(':checked')) {
+            $('#tabView').hide();
+            $('#treeView').show();
+            updateTreeView();
+        } else {
+            $('#treeView').hide();
+            $('#tabView').show();
+            updateCategoryTabs();
+        }
+    }
+
+    $('#viewModeSwitch').change(updateView);
+
+    $('#addCategoryBtn').click(function () {
+    $('#addCategoryModal').modal('show');
+});
+
+$('#saveCategoryBtn').click(function () {
+    const categoryName = $('#categoryName').val().trim();
+
+    if (categoryName && !categories.includes(categoryName)) {
+        // Enviar categoria para o backend
+        $.ajax({
+            url: '/lojas/categorias',  // A rota de adicionar categoria no Laravel
+            method: 'POST',
+            data: {
+                nome: categoryName,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Token CSRF para segurança
+            },
+            success: function (response) {
+                categories.push(categoryName);
+                items[categoryName] = [];
+                activeCategory = categoryName;
                 updateView();
-            });
-        </script>
+                $('#addCategoryModal').modal('hide');
+                $('#categoryName').val('');
+                Swal.fire('Sucesso', 'Categoria adicionada com sucesso!', 'success');
+            },
+            error: function () {
+                Swal.fire('Erro', 'Erro ao adicionar categoria!', 'error');
+            }
+        });
+    } else {
+        Swal.fire('Erro', 'Nome de categoria inválido ou já existe!', 'error');
+    }
+});
+
+$('#addItemBtn').click(function () {
+    if (categories.length === 0) {
+        Swal.fire('Erro', 'Adicione uma categoria primeiro!', 'error');
+    } else {
+        $('#itemCategory').val(activeCategory);
+        $('#addItemModal').modal('show');
+    }
+});
+
+$('#saveItemBtn').click(function () {
+    const category = $('#itemCategory').val();
+    const itemName = $('#itemName').val().trim();
+    const itemDescription = $('#itemDescription').val().trim();
+    const itemPrice = parseFloat($('#itemPrice').val());
+    const itemImageFile = $('#itemImage')[0].files[0];
+
+    if (category && itemName && itemDescription && !isNaN(itemPrice) && itemImageFile) {
+        const formData = new FormData();
+        formData.append('categoriaNome', category);
+        formData.append('nome', itemName);
+        formData.append('descricao', itemDescription);
+        formData.append('preco', itemPrice);
+        formData.append('foto', itemImageFile);
+        formData.append('_token', $('meta[name="csrf-token"]').attr('content')); // Token CSRF
+
+        // Enviar produto para o backend
+        $.ajax({
+            url: '/lojas/produtos',  // A rota de adicionar produto no Laravel
+            method: 'POST',
+            data: formData,
+            contentType: false,  // Obrigatório para envio de arquivos
+            processData: false,  // Obrigatório para envio de arquivos
+            success: function (response) {
+                const newItem = {
+                    name: itemName,
+                    description: itemDescription,
+                    price: itemPrice,
+                    image: response.imagem  // Caminho retornado pelo backend
+                };
+                items[category].push(newItem);
+                updateView();
+                $('#addItemModal').modal('hide');
+                $('#itemName').val('');
+                $('#itemDescription').val('');
+                $('#itemPrice').val('');
+                $('#itemImage').val('');
+                Swal.fire('Sucesso', 'Item adicionado com sucesso!', 'success');
+            },
+            error: function () {
+                Swal.fire('Erro', 'Erro ao adicionar item!', 'error');
+            }
+        });
+    } else {
+        Swal.fire('Erro', 'Preencha todos os campos corretamente!', 'error');
+    }
+});
+
+
+    updateView();
+});
+</script>
+
     </body>
 
     </html>

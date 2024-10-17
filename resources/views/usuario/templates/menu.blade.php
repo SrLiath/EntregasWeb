@@ -96,6 +96,23 @@
                 display: none;
             }
         }
+
+        /* Estilo do botão sair */
+        .btn-sair {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-sair:hover {
+            background-color: #ff1a1a;
+        }
     </style>
 </head>
 
@@ -141,6 +158,7 @@
                 </a>
             </li>
         </ul>
+        <button class="btn-sair" onclick="location.href='/logout'">Sair</button>
     </div>
 
     <!-- Barra inferior para mobile com hambúrguer -->
@@ -184,7 +202,6 @@
             </li>
         </ul>
     </nav>
-
 
     <!-- Bootstrap JS e dependências -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
