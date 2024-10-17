@@ -68,7 +68,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="saveNewCategory">Salvar</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                    id="saveNewCategory">Salvar</button>
             </div>
         </div>
     </div>
@@ -87,7 +88,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" id="addCategoryBtn">Adicionar Categoria</button>
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="addCategoryBtn">Adicionar
+                    Categoria</button>
             </div>
         </div>
     </div>
@@ -96,9 +98,9 @@
 <!-- Incluindo SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         var botaoedit
-        $('.edit-btn').on('click', function () {
+        $('.edit-btn').on('click', function() {
             var tipoId = $(this).data('id'); // Captura o ID do tipo
             botaoedit = tipoId
             // Faz a requisição AJAX para buscar as categorias associadas
@@ -109,12 +111,12 @@
                     _token: '{{ csrf_token() }}', // Token CSRF do Laravel
                     id_tipo: tipoId // Envia o ID do tipo
                 },
-                success: function (response) {
+                success: function(response) {
                     // Limpa a lista de categorias no modal
                     $('#categoryList').empty();
 
                     // Itera sobre as categorias retornadas e adiciona à lista
-                    response.forEach(function (categoria) {
+                    response.forEach(function(categoria) {
                         $('#categoryList').append(`
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             ${categoria.categoria}
@@ -126,7 +128,7 @@
                     // Abre o modal após carregar as categorias
                     $('#editModal').modal('show');
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     // Exibe erro no console
                     console.error('Erro ao buscar categorias:', xhr.responseText);
                 }
@@ -134,13 +136,13 @@
         });
 
         // Lógica para salvar alterações
-        $('#saveChanges').on('click', function () {
+        $('#saveChanges').on('click', function() {
             var newName = $('#categoryName').val();
             $('#editModal').modal('hide');
         });
 
         // Quando o botão de excluir é clicado
-        $('.delete-btn').on('click', function () {
+        $('.delete-btn').on('click', function() {
             var id = $(this).data('id'); // Pega o ID da categoria
             var row = $(this).closest('tr'); // A linha da tabela para remover depois
             var name = $(this).data('name'); // Nome da categoria
@@ -163,7 +165,7 @@
                         data: {
                             _token: '{{ csrf_token() }}' // Necessário para o Laravel CSRF
                         },
-                        success: function (response) {
+                        success: function(response) {
                             // Se o delete for bem-sucedido, remove a linha da tabela
                             row.remove();
 
@@ -174,7 +176,7 @@
                                 'success'
                             );
                         },
-                        error: function (xhr) {
+                        error: function(xhr) {
                             // Tratamento de erro
                             alert('Ocorreu um erro ao excluir a categoria.');
                             console.error('Erro ao excluir categoria:');
@@ -189,7 +191,7 @@
             });
         });
 
-        $('#addCategory').click(function () {
+        $('#addCategoryBtn').click(function() {
             // Captura o nome da nova categoria
             var newCategoryName = $('#newCategoryName').val();
 
@@ -207,7 +209,7 @@
                     _token: '{{ csrf_token() }}',
                     tipo: newCategoryName
                 },
-                success: function (response) {
+                success: function(response) {
                     alert('Categoria adicionada com sucesso!');
                     $('#addModal').modal('hide');
                     $('#newCategoryName').val('');
@@ -223,7 +225,7 @@
                         </tr>
                     `);
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     alert('Ocorreu um erro ao adicionar a categoria.');
                     console.error('Erro ao adicionar categoria:');
                     console.error('Status: ' + xhr.status); // Status HTTP (ex: 404, 500)
@@ -238,7 +240,7 @@
             });
         });
 
-        $('#saveNewCategory').on('click', function () {
+        $('#saveNewCategory').on('click', function() {
             var novaCategoria = $('#newCategoryNameaaa').val();
 
             if (novaCategoria.trim() === '') {
@@ -254,7 +256,7 @@
                     id_tipo: botaoedit,
                     categoria: novaCategoria
                 },
-                success: function (response) {
+                success: function(response) {
                     $('#categoryList').append(`
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         ${response.categoria}
@@ -267,13 +269,13 @@
                     // Exibe mensagem de sucesso
                     alert('Categoria adicionada com sucesso!');
                 },
-                error: function (xhr) {
+                error: function(xhr) {
                     // Exibe erro no console
                     console.error('Erro ao adicionar categoria:', xhr.responseText);
                 }
             });
         });
-        $(document).on('click', '.delete-category-btn', function () {
+        $(document).on('click', '.delete-category-btn', function() {
             var categoryId = $(this).data('id'); // Get the ID of the category
             var listItem = $(this).closest('li'); // Get the list item for the category
 
@@ -296,7 +298,7 @@
                         data: {
                             _token: '{{ csrf_token() }}' // CSRF token for security
                         },
-                        success: function (response) {
+                        success: function(response) {
                             // Remove the category from the list
                             listItem.remove();
 
@@ -307,7 +309,7 @@
                                 'success'
                             );
                         },
-                        error: function (xhr) {
+                        error: function(xhr) {
                             // Handle error
                             Swal.fire(
                                 'Erro!',
