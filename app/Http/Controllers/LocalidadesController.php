@@ -34,7 +34,8 @@ class LocalidadesController extends Controller
         ]);
         
         $cidades = Cidade::where('estado', $request->estado)->with('estado')->get();
-        return response()->json($cidades);
+        $estado = Estado::where(['id_estado' => $request->estado])->first();
+        return response()->json(['cidades' => $cidades, 'estado' => $estado->nome]);
     }
 
     // Armazena uma nova cidade
@@ -56,7 +57,11 @@ class LocalidadesController extends Controller
             'cidade' => 'required|exists:cidades,id_cidade' // Verifica se a cidade existe
         ]);
 
-        $bairros = Bairro::where('cidade', $request->cidade)->with('cidade')->get();
+        $bairros = Bairro::join('cidades', 'bairros.cidade', '=', 'cidades.id_cidade')
+        ->where('cidades.id_cidade', $request->cidade) 
+        ->select('bairros.*', 'cidades.*', 'bairros.nome as nome_bairro')
+        ->get();
+    
         return response()->json($bairros);
     }
 

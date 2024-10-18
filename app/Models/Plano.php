@@ -14,6 +14,7 @@ class Plano extends Model
 
     // Define os atributos que podem ser preenchidos em massa
     protected $fillable = [
+        'id',
         'nome',
         'descricao',
         'valor',

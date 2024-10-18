@@ -18,8 +18,7 @@
                     /*
                       "amount" é a quantia total a pagar por todos os meios de pagamento com exceção da Conta Mercado Pago e Parcelas sem cartão de crédito, que têm seus valores de processamento determinados no backend através do "preferenceId"
                     */
-                    amount: 10000,
-                    preferenceId: "<PREFERENCE_ID>",
+                    amount: {{$plano->valor}},
                     payer: {
                         firstName: "",
                         lastName: "",
@@ -29,7 +28,7 @@
                 customization: {
                     visual: {
                         style: {
-                            theme: "default",
+                            theme: "bootstrap",
                         },
                     },
                     paymentMethods: {

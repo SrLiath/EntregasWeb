@@ -94,7 +94,10 @@ Route::middleware([LojaAdmin::class])->group(function () {
     Route::get('/loja/dados', function () {
         $user = Auth::user();
         $idLoja = $user->lojaId;
-        $produtos = Loja::where(['id' => $idLoja])->first();
+        $produtos = Loja::join('users', 'lojas.id', '=', 'users.lojaId')
+                        ->where('lojas.id', $idLoja)
+                        ->select('lojas.*', 'users.*')  // Seleciona os campos necessários
+                        ->first();
         return view('usuario.dados', ['produtos' => $produtos]);
     });
 
@@ -122,7 +125,9 @@ Route::get('/cadastre', function () {
 
     return view('cadastre', ['lojas' => $lojas, 'planos' => $planos]);
 });
-Route::get('/checkout', [LocalidadesController::class, 'verifyCheckout']);
+Route::post('/checkout', [PaymentGateway::class, 'verifyCheckout']);
+Route::get('/checkout', [PaymentGateway::class, 'page']);
+Route::post('/process_payment', [PaymentGateway::class, 'processPayment']);
 
 Route::get('/sobre', function () {
     return view('sobre');

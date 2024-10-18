@@ -121,32 +121,32 @@
                     <input type="file" id="photoInput" style="display: none;" accept="image/*">
                 </div>
                 <div class="card-body" style="padding-top: 60px;">
-                    <h2 class="text-center mb-4">Dados do Estabelecimento</h2>
+                    <h2 class="text-center mb-4">Perfil</h2>
                     <form id="estabelecimentoForm">
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="nomeEstabelecimento" class="form-label">Nome do Estabelecimento</label>
-                                <input type="text" class="form-control" id="nomeEstabelecimento" required>
+                                <input type="text" class="form-control" value="{{ $produtos->estabelecimento}}" id="nomeEstabelecimento" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="cpf" class="form-label">CPF</label>
-                                <input type="text" class="form-control" id="cpf" required>
+                                <input type="text" class="form-control" value="{{ $produtos->cpf}}"  id="cpf" required>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="emailCobranca" class="form-label">Email de Cobrança</label>
-                                <input type="email" class="form-control" id="emailCobranca" required>
+                                <input type="email" class="form-control" value="{{ $produtos->email}}"  id="emailCobranca" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="telefone" class="form-label">Telefone</label>
-                                <input type="tel" class="form-control" id="telefone" required>
+                                <input type="tel" class="form-control" value="{{ $produtos->estabelecimento}}"  id="telefone" required>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="login" class="form-label">Login</label>
-                                <input type="text" class="form-control" id="login" required>
+                                <input type="text" value="{{ $produtos->email}}"  class="form-control" id="login" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="senha" class="form-label">Senha</label>
@@ -158,69 +158,81 @@
                                 <label for="site" class="form-label">Link para o Site</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-globe"></i></span>
-                                    <input type="url" class="form-control" id="site">
+                                    <input type="url" class="form-control" value="{{ $produtos->site}}"  id="site">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <label for="instagram" class="form-label">Link para o Instagram</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fab fa-instagram"></i></span>
-                                    <input type="url" class="form-control" id="instagram">
+                                    <input type="url" class="form-control" value="{{ $produtos->insta}}"  id="instagram">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <label for="facebook" class="form-label">Link para o Facebook</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fab fa-facebook"></i></span>
-                                    <input type="url" class="form-control" id="facebook">
+                                    <input type="url" class="form-control" value="{{ $produtos->fb}}"  id="facebook">
                                 </div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="whatsapp" class="form-label">WhatsApp</label>
-                                <input type="tel" class="form-control" id="whatsapp">
+                                <input type="tel" class="form-control" value="{{ $produtos->wpp}}"  id="whatsapp">
                             </div>
+                            <script>
+                                      $('#whatsapp').on('input', function () {
+                        var input = $(this).val();
+
+                        // Remove qualquer caractere que não seja número
+                        input = input.replace(/\D/g, '');
+
+                        // Formata o número para o formato (xx) xxxxx-xxxx
+                        if (input.length > 10) {
+                            input = input.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                        } else if (input.length > 6) {
+                            input = input.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+                        } else if (input.length > 2) {
+                            input = input.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+                        } else {
+                            input = input.replace(/^(\d*)/, '($1');
+                        }
+
+                        // Atualiza o valor do campo de entrada
+                        $(this).val(input);
+                    });
+               
+                            </script>
                             <div class="col-md-6">
-                                <label for="telefoneAlternativo" class="form-label">Telefone Alternativo</label>
-                                <input type="tel" class="form-control" id="telefoneAlternativo">
+                                <label for="url" class="form-label">Url do site</label>
+                                <input type="url" class="form-control" id="url" oninput="addPrefix(this)">
                             </div>
                         </div>
+                        <script>
+                        function addPrefix(input) {
+                            const prefix = "www.diskentregas.com/";
+                            
+                            // Impede repetição do prefixo
+                            if (!input.value.startsWith(prefix)) {
+                                input.value = prefix;
+                            }
+                        }
+                        $(document).ready(()=>{
+                        var url = $('#url').val('www.diskentregas.com/'+ '{{ $produtos->nome}}');
+                        })
+                        </script>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="horarioAbertura" class="form-label">Horário de Abertura</label>
-                                <input type="time" class="form-control" id="horarioAbertura" required>
+                                <input type="time" class="form-control" value="{{ $produtos->horario_inicio }}" id="horarioAbertura" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="horarioFechamento" class="form-label">Horário de Fechamento</label>
-                                <input type="time" class="form-control" id="horarioFechamento" required>
+                                <input type="time" class="form-control" value="{{ $produtos->horario_fim }}" id="horarioFechamento" required>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Regiões de Entrega</label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="entregaBrasil">
-                                <label class="form-check-label" for="entregaBrasil">Entrego em todo Brasil</label>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="entregaEstado">
-                                <label class="form-check-label" for="entregaEstado">Entrego em todo o estado</label>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="entregaCidade">
-                                <label class="form-check-label" for="entregaCidade">Entrego em toda cidade</label>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="entregaEspecifica">
-                                <label class="form-check-label" for="entregaEspecifica">Entrego em regiões
-                                    específicas</label>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="regioesEspecificas" class="form-label">Regiões Específicas de Entrega</label>
-                            <textarea class="form-control" id="regioesEspecificas" rows="3"
-                                placeholder="Liste as regiões específicas de entrega, se aplicável"></textarea>
-                        </div>
+
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary btn-lg">Salvar Alterações</button>
                         </div>
@@ -279,7 +291,7 @@
 
                     // Envia os dados via AJAX
                     $.ajax({
-                        url: '{{ route('loja.update', $produtos->id) }}', // URL da rota para atualizar
+                        url: '', // URL da rota para atualizar
                         type: 'POST',
                         data: formData,
                         processData: false, // Necessário para enviar dados do FormData

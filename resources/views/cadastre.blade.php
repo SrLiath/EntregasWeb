@@ -18,6 +18,8 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         $.ajaxSetup({
             headers: {
@@ -221,17 +223,18 @@
                 <h3>Escolha um plano</h3>
             </center>
             <div class="plans-container">
-                @foreach ($planos as $p)
+            @foreach ($planos as $index => $p)
 
-                    <div class="plan selected" onclick="selectPlan(this, 'Plano Brasil')">
-                        <h2>{{$p->nome}}</h2>
-                        <h3>
-                            {{ ($p->valor == floor($p->valor)) ? intval($p->valor) : $p->valor }}R$
-                        </h3>
+<div class="plan {{ $index === 0 ? 'selected' : '' }}" onclick="selectPlan(this, 'Plano Brasil')">
+    <h2>{{$p->nome}}</h2>
+    <h3>
+        {{ ($p->valor == floor($p->valor)) ? intval($p->valor) : $p->valor }} R$
+    </h3>
+    <p>{!! $p->descricao !!}</p>
+</div>
 
-                        <p>{!! $p->descricao !!}</p>
-                    </div>
-                @endforeach
+@endforeach
+
             </div>
             <script>
                 let selectedPlanValue = 'Plano Brasil'; // Inicializa com o plano pré-selecionado
@@ -269,15 +272,7 @@
                     </div>
                 </div>
 
-                <!-- Email de cobrança -->
-                <div class="col-12 col-md-4 mb-2">
-                    <label for="email-cobranca">Email de cobrança</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                        <input type="email" class="form-control" id="email-cobranca" placeholder="Email de cobrança"
-                            required>
-                    </div>
-                </div>
+
 
                 <!-- Telefone -->
                 <div class="col-12 col-md-4 mb-2">
@@ -289,11 +284,13 @@
                 </div>
 
                 <!-- Login -->
+                <!-- Email de cobrança -->
                 <div class="col-12 col-md-4 mb-2">
-                    <label for="login">Login</label>
+                    <label for="email-cobranca">Email de Login</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-user-lock"></i></span>
-                        <input type="text" class="form-control" id="login" placeholder="Login" required>
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control" id="email-cobranca" placeholder="Email de cobrança"
+                            required>
                     </div>
                 </div>
 
@@ -395,7 +392,13 @@
                             placeholder="Horário de Fechamento" required>
                     </div>
                 </div>
-
+                <div class="col-md-4">
+                                <label for="site" class="form-label">Link para o Site</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                <input type="url" class="form-control" id="url" oninput="addPrefix(this)">
+                                </div>
+                            </div>
                 <div class="col-12 col-md-4 mb-2">
                     <label class="form-label">Dias trabalhados e feriados</label>
                     <div class="dias-container">
@@ -448,7 +451,20 @@
                         </label>
                     </div>
                 </div>
-
+              
+                            <script>
+                                                   function addPrefix(input) {
+                            const prefix = "www.diskentregas.com/";
+                            
+                            // Impede repetição do prefixo
+                            if (!input.value.startsWith(prefix)) {
+                                input.value = prefix;
+                            }
+                        }
+                        $(document).ready(()=>{
+                        var url = $('#url').val('www.diskentregas.com/');
+                        })
+                            </script>
                 <style>
                     .dias-container {
                         display: flex;
@@ -644,7 +660,7 @@
             const bairrosContainer = $('#bairrosContainer');
             const selectedLocations = $('#selectedLocations');
 
-            function createButton(id, text, container, type) {
+            function createButton(id, text, container, type, id_cidade = false) {
                 const button = $('<button>')
                     .addClass('btn btn-location')
                     .attr('data-id', id)
@@ -653,18 +669,23 @@
                     .click(function () {
                         $(this).toggleClass('active');
                         updateSelectedLocations();
-
-                        // Carregar cidades se o tipo for 'estado'
                         if (type === 'estado') {
-                            // Verifica se o botão está ativo ou não
                             if ($(this).hasClass('active')) {
-                                carregarCidades(id); // Carrega cidades do estado selecionado
+                                carregarCidades(id); 
                             } else {
-                                // Se o estado foi desmarcado, remove as cidades correspondentes
                                 removerCidades(id);
                             }
+                        }else if (type === 'cidade'){
+                            if ($(this).hasClass('active')) {
+                                carregarBairros(id); 
+                            } else {
+                                removerBairros(id);
+                            }
                         }
-                    });
+                    })
+                    if(id_cidade){
+                        button.attr('data-cidade-id', id_cidade)
+                    };
                 container.append(button);
                 return button;
             }
@@ -725,7 +746,12 @@
                             if (!cidades[estadoId]) {
                                 cidades[estadoId] = []; // Inicializa o array para as cidades desse estado
                             }
-                            data.forEach(function (val) {
+                            const estadoHeader = $('<h1 class="addmore">').attr('data-estado-id', estadoId).attr('data-type', 'bairro').text(data.estado);
+                            cidadesContainer.append(`<div class="addmore" data-type="bairro" data-estado-id="${estadoId}" style="height: 30px; width: 100vw;"></div>`);
+                            
+                            cidadesContainer.append(estadoHeader);
+                            cidadesContainer.append(`<div class="addmore" data-type="bairro"  data-estado-id="${estadoId}" style="height: 30px; width: 100vw;"></div>`);
+                            data.cidades.forEach(function (val) {
                                 createButton(val.id_cidade, val.nome, cidadesContainer, 'cidade')
                                     .attr('data-estado-id',
                                         estadoId); // Adiciona o ID do estado à cidade
@@ -740,7 +766,19 @@
             function removerCidades(estadoId) {
                 // Remove as cidades relacionadas ao estado que foi desmarcado
                 cidadesContainer.find(`.btn-location[data-estado-id="${estadoId}"]`)
-                    .remove(); // Remove as cidades correspondentes
+                    .remove(); 
+                    cidadesContainer.find(`.addmore[data-estado-id="${estadoId}"]`)
+                    .remove(); 
+                updateSelectedLocations(); // Atualiza as localizações selecionadas
+            }
+
+
+            function removerBairros(estadoId) {
+                // Remove as cidades relacionadas ao estado que foi desmarcado
+                bairrosContainer.find(`.btn-location[data-type="bairro"][data-cidade-id="${estadoId}"]`)
+                    .remove(); 
+                    bairrosContainer.find(`.addmore[data-cidade-id="${estadoId}"]`)
+                    .remove(); 
                 updateSelectedLocations(); // Atualiza as localizações selecionadas
             }
 
@@ -749,13 +787,36 @@
                     $.post('/api/bairros', {
                         cidade: cidadeId
                     })
-                        .done(function (data) {
-                            bairrosContainer.empty();
-                            data.forEach(function (val) {
-                                createButton(val.id_bairro, val.nome, bairrosContainer, 'bairro');
-                            });
+                    .done(function(data) {
+
+                            if (data.length > 0) {
+                                // Acessa o primeiro bairro do array
+                                const primeiroBairro = data[0];
+
+                                const bairroId = primeiroBairro.id_bairro;
+                                const nomeBairro = primeiroBairro.nome;
+                                const cidadeId = primeiroBairro.cidade;
+
+                                // Criando o cabeçalho do bairro
+                                const estadoHeader = $('<h1 class="addmore">')
+                                    .attr('data-cidade-id', cidadeId)
+                                    .text(nomeBairro);
+
+                                // Adicionando elementos ao contêiner
+                                bairrosContainer.append(`<div class="addmore" data-cidade-id="${cidadeId}" style="height: 30px; width: 100vw;"></div>`);
+                                bairrosContainer.append(estadoHeader);
+                                bairrosContainer.append(`<div class="addmore" data-cidade-id="${cidadeId}" style="height: 30px; width: 100vw;"></div>`);
+                                
+                                // Loop através dos bairros, se necessário
+                                data.forEach(function(val) {
+                                    createButton(val.id_bairro, val.nome_bairro, bairrosContainer, 'bairro',cidadeId);
+                                })
+                            } else {
+                                console.error("Nenhum bairro encontrado.");
+                            }
                         })
                         .fail(function (xhr, status, error) {
+                            console.log(xhr.responseText)
                             console.error('Erro ao carregar bairros:', status, error);
                         });
                 } else {
@@ -787,47 +848,81 @@
                     $('#categoria').prop('disabled', true);
                 }
             });
+            // Função para coletar dias trabalhados
+function obterDiasTrabalhados() {
+    const diasCheckboxes = document.querySelectorAll('.dia-checkbox');
+    const diasTrabalhados = [];
 
-            // Ação ao clicar no botão Confirmar
-            $('#btn-search').on('click', function () {
-                // Obtém os valores selecionados
-                let estado = $('#estado').find('option:selected').text();
-                let cidade = $('#cidade').find('option:selected').text();
-                let bairro = $('#bairro').find('option:selected').text();
-                let tipo = $('#tipo').find('option:selected').text();
-                let categoria = $('#categoria').find('option:selected').text();
+    diasCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            diasTrabalhados.push(parseInt(checkbox.value));
+        }
+    });
 
-                let url = '';
+    return diasTrabalhados;
+}
 
-                if (estado && $('#estado').val() != '') {
-                    url += '/' + encodeURIComponent(estado);
+$('#btn-search').click(async () => {
+    // Verificar valor do reCAPTCHA
+    const recaptchaResponse = grecaptcha.getResponse();
 
-                    if (cidade && $('#cidade').val() != '') {
-                        url += '/' + encodeURIComponent(cidade);
-                        if (bairro && $('#bairro').val() != '') {
-                            url += '/' + encodeURIComponent(bairro);
-                        }
-                    }
+    // Validar se todos os campos estão preenchidos
+    if (
+        estados && cidades && bairros && selectedPlanValue &&
+        $('#responsavel').val() && $('#cpf').val() && $('#telefone').val() &&
+        $('#email-cobranca').val() && $('#senha').val() &&
+        $('#nome-estabelecimento').val() && $('#link-site').val() &&
+        $('#link-instagram').val() && $('#link-facebook').val() &&
+        $('#whatsapp').val() && $('#telefone-2').val() &&
+        $('#horario-abertura').val() && $('#horario-fechamento').val() &&
+        $('#url').val() && await obterDiasTrabalhados().length > 0 &&
+        recaptchaResponse // Certificar que o reCAPTCHA foi validado
+    ) {
+        var dados = {
+            estados,
+            cidades,
+            bairros,
+            'plano': selectedPlanValue,
+            'responsavel': $('#responsavel').val(),
+            'cpf': $('#cpf').val(),
+            'tel': $('#telefone').val(),
+            'email': $('#email-cobranca').val(),
+            'senha': $('#senha').val(),
+            'nome-estabelecimento': $('#nome-estabelecimento').val(),
+            'site': $('#link-site').val(),
+            'insta': $('#link-instagram').val(),
+            'fb': $('#link-facebook').val(),
+            'wpp': $('#whatsapp').val(),
+            'tel': $('#telefone-2').val(),
+            'abertura': $('#horario-abertura').val(),
+            'fechamento': $('#horario-fechamento').val(),
+            'url': $('#url').val(),
+            'dias': await obterDiasTrabalhados(),
+            'g-recaptcha-response': recaptchaResponse
+        };
 
-
-                    let params = [];
-                    if (tipo) {
-                        params.push('tipo=' + encodeURIComponent(tipo));
-                    }
-                    if (categoria) {
-                        params.push('categoria=' + encodeURIComponent(categoria));
-                    }
-
-                    // Se houver parâmetros, adiciona à URL
-                    if (params.length > 0) {
-                        url += '?' + params.join('&');
-                    }
-
-                    window.location.href = url;
-                } else {
-                    alert('Por favor, selecione pelo menos o estado.');
-                }
-            });
+        // Realizar a requisição AJAX
+        $.ajax({
+            url: `/checkout`,
+            type: 'POST',
+            data: dados,
+            success: function (response) {
+                window.location.href = window.location.origin + '/checkout?plano=' + response.message;
+            },
+            error: function (xhr, error) {
+                console.log(xhr.responseText);
+            }
+        });
+    } else {
+        // Exibir um alerta de erro se algum campo estiver vazio ou o reCAPTCHA não estiver preenchido
+        Swal.fire({
+            title: 'Erro!',
+            text: "Por favor, preencha todos os campos e valide o reCAPTCHA.",
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+}); // <-- Aqui fechamos a função corretamente
 
         });
     </script>
