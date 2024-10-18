@@ -4,10 +4,10 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
     integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous">
-    </script>
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 @include('usuario.templates.menu', ['menu' => 'produto'])
@@ -95,7 +95,7 @@
     <body>
 
         <div class="container">
-            <h1 class="text-center my-4">Photo Gallery</h1>
+            <h1 class="text-center my-4">Galeria</h1>
             <div class="gallery" id="gallery"></div>
         </div>
 
@@ -119,73 +119,88 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            const galleryItems = [{
-                src: 'https://picsum.photos/id/1018/300/300',
-                name: 'Mountain View'
-            },
-            {
-                src: 'https://picsum.photos/id/1015/300/300',
-                name: 'River Stream'
-            },
-            {
-                src: 'https://picsum.photos/id/1019/300/300',
-                name: 'Misty Forest'
-            },
-            {
-                src: 'https://picsum.photos/id/1039/300/300',
-                name: 'Lake Reflection'
-            },
-            {
-                src: 'https://picsum.photos/id/1043/300/300',
-                name: 'Autumn Colors'
-            },
-            {
-                src: 'https://picsum.photos/id/1044/300/300',
-                name: 'Desert Dunes'
-            },
-            {
-                src: 'https://picsum.photos/id/1045/300/300',
-                name: 'Foggy Mountains'
-            },
-            {
-                src: 'https://picsum.photos/id/1049/300/300',
-                name: 'Pebble Beach'
-            }
-            ];
+            const galleryItems = {
+                "categorias": [{
+                        "nome": "Pizzas",
+                        "produtos": [{
+                                "nome": "Calabresa",
+                                "preco": "35",
+                                "descricao": null,
+                                "foto": "/lojas/teste/produtos/1729221933-images.jpg"
+                            },
+                            {
+                                "nome": "mussarella",
+                                "preco": "35",
+                                "descricao": null,
+                                "foto": "/lojas/teste/produtos/1729221951-698-pizza-de-mussarela.jpg"
+                            }
+                        ]
+                    },
+                    {
+                        "nome": "esfiha",
+                        "produtos": [{
+                                "nome": "5 esfihas",
+                                "preco": "30",
+                                "descricao": null,
+                                "foto": "/lojas/teste/produtos/1729222025-iStock-537521984-1.jpeg"
+                            },
+                            {
+                                "nome": "10 esfihas",
+                                "preco": "60",
+                                "descricao": null,
+                                "foto": "/lojas/teste/produtos/1729222047-iStock-537521984-1.jpeg"
+                            }
+                        ]
+                    }
+                ]
+            };
 
-            $(document).ready(function () {
+            $(document).ready(function() {
                 const gallery = $('#gallery');
                 let currentIndex = 0;
+                let flattenedProducts = [];
 
-                galleryItems.forEach((item, index) => {
-                    gallery.append(`
-                <div class="gallery-item" data-index="${index}">
-                    <img src="${item.src}" alt="${item.name}">
-                    <p>${item.name}</p>
-                </div>
-            `);
+                // Flatten the products array from all categories
+                galleryItems.categorias.forEach((categoria) => {
+                    categoria.produtos.forEach((produto) => {
+                        flattenedProducts.push(produto);
+                    });
                 });
 
-                $('.gallery-item').on('click', function () {
+                // Append products to the gallery
+                flattenedProducts.forEach((item, index) => {
+                    gallery.append(`
+                    <div class="gallery-item" data-index="${index}">
+                        <img src="${item.foto}" alt="${item.nome}">
+                        <p>${item.nome}</p>
+                    </div>
+                `);
+                });
+
+                // Event handler for clicking a gallery item
+                $('.gallery-item').on('click', function() {
                     currentIndex = $(this).data('index');
                     updateModal();
                     $('#imageModal').modal('show');
                 });
 
-                $('.modal-prev').on('click', function () {
-                    currentIndex = (currentIndex - 1 + galleryItems.length) % galleryItems.length;
+                // Event handler for previous button in modal
+                $('.modal-prev').on('click', function() {
+                    currentIndex = (currentIndex - 1 + flattenedProducts.length) % flattenedProducts.length;
                     updateModal();
                 });
 
-                $('.modal-next').on('click', function () {
-                    currentIndex = (currentIndex + 1) % galleryItems.length;
+                // Event handler for next button in modal
+                $('.modal-next').on('click', function() {
+                    currentIndex = (currentIndex + 1) % flattenedProducts.length;
                     updateModal();
                 });
 
+                // Update modal with the current product information
                 function updateModal() {
-                    const item = galleryItems[currentIndex];
-                    $('#modalImage').attr('src', item.src).attr('alt', item.name);
-                    $('#modalTitle').text(item.name);
+                    const item = flattenedProducts[currentIndex];
+                    $('#modalImage').attr('src', item.foto).attr('alt', item.nome);
+                    $('#modalTitle').text(item.nome);
                 }
             });
         </script>

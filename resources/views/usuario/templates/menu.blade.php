@@ -205,22 +205,6 @@
 
     <!-- Bootstrap JS e dependências -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Fecha o menu ao clicar fora dele
-        document.addEventListener('click', function (event) {
-            const menuMobile = document.getElementById('menuMobile');
-            const toggleButton = document.querySelector('[data-bs-target="#menuMobile"]');
-
-            // Verifica se o clique foi fora do menu e do botão de alternância
-            if (menuMobile.classList.contains('show') && !menuMobile.contains(event.target) && !toggleButton
-                .contains(event.target)) {
-                const bsCollapse = new bootstrap.Collapse(menuMobile, {
-                    toggle: false
-                });
-                bsCollapse.hide();
-            }
-        });
-    </script>
 </body>
 
 </html>

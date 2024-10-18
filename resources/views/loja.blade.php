@@ -20,7 +20,7 @@
 
         .banner {
             height: 200px;
-            background-image: url('{{ $loja->banner}}');
+            background-image: url('{{ $loja->banner }}');
             background-size: cover;
             background-position: center;
         }
@@ -126,35 +126,35 @@
 
         <!-- Foto de perfil e informações -->
         <div class="container text-center mb-5">
-            <img src="{{$loja->imagem}}" alt="Logo do restaurante" class="profile-pic mb-3">
-            <h2 class="mt-3">{{ $loja->nome}}</h2>
-            <p class="lead">{{ $loja->descricao}}</p>
+            <img src="{{ $loja->imagem }}" alt="Logo do restaurante" class="profile-pic mb-3">
+            <h2 class="mt-3">{{ $loja->nome }}</h2>
+            <p class="lead">{{ $loja->descricao }}</p>
             <div class="d-flex justify-content-center align-items-center">
-    @if($loja->qntsNotas > 0)
-        <span class="me-3">
-            <i class="fas fa-star text-warning"></i>
-            {{ $loja->totalNotas / $loja->qntsNotas }} ({{ $loja->qntsNotas }} avaliações)
-        </span>
-    @endif
+                @if ($loja->qntsNotas > 0)
+                    <span class="me-3">
+                        <i class="fas fa-star text-warning"></i>
+                        {{ $loja->totalNotas / $loja->qntsNotas }} ({{ $loja->qntsNotas }} avaliações)
+                    </span>
+                @endif
 
-    <span class="me-3">
-        @if($loja->tempo != '' && $loja->tempo != NULL)
-        <i class="fas fa-motorcycle text-secondary"></i>
-        {{ $loja->tempo }}
-        @endif
+                <span class="me-3">
+                    @if ($loja->tempo != '' && $loja->tempo != null)
+                        <i class="fas fa-motorcycle text-secondary"></i>
+                        {{ $loja->tempo }}
+                    @endif
 
-    </span>
+                </span>
 
-    <span>
-        <i class="fas fa-tag text-success"></i>
+                <span>
+                    <i class="fas fa-tag text-success"></i>
 
-        @if($loja->frete > 0)
-           Frete {{ $loja->frete }}
-        @else
-            Sem frete
-        @endif
-    </span>
-</div>
+                    @if ($loja->frete > 0)
+                        Frete {{ $loja->frete }}
+                    @else
+                        Sem frete
+                    @endif
+                </span>
+            </div>
 
         </div>
         <div class="d-flex justify-content-center my-4">
@@ -217,7 +217,8 @@
                                 <p class="fw-bold" id="productPrice"></p>
                                 <div class="mb-3">
                                     <label for="quantity" class="form-label">Quantidade:</label>
-                                    <input type="number" class="form-control" id="quantity" value="1" min="1">
+                                    <input type="number" class="form-control" id="quantity" value="1"
+                                        min="1">
                                 </div>
                                 <div class="mb-3">
                                     <label for="note" class="form-label">Nota (opcional):</label>
@@ -245,7 +246,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="cartModalLabel">Seu Carrinho</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <ul id="cart-items" class="list-group mb-3">
@@ -266,8 +268,8 @@
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-               const data = {!!$loja->produtos!!}
-            document.addEventListener('DOMContentLoaded', function () {
+            const data = {!! $loja->produtos !!}
+            document.addEventListener('DOMContentLoaded', function() {
                 const menuTabs = document.getElementById('menuTabs');
                 const menuTabsContent = document.getElementById('menuTabsContent');
 
@@ -302,14 +304,14 @@
                         productCard.className = 'col-md-4 mb-4';
                         productCard.innerHTML = `
                 <div class="menu-item card" data-bs-toggle="modal" data-bs-target="#productModal"
-                    data-name="${produto.nome}" data-price="${produto.preco.toFixed(2)}"
+                    data-name="${produto.nome}" data-price="${produto.preco}"
                     data-description="${produto.descricao}"
                     data-image="${produto.foto}">
                     <img src="${produto.foto}" alt="${produto.nome}" class="card-img-top">
                     <div class="card-body">
                         <h5 class="card-title">${produto.nome}</h5>
                         <p class="card-text">${produto.descricao}</p>
-                        <p class="fw-bold mb-2">R$ ${produto.preco.toFixed(2)}</p>
+                        <p class="fw-bold mb-2">R$ ${produto.preco}</p>
                     </div>
                 </div>
             `;
@@ -323,7 +325,7 @@
             });
 
             // Função para mostrar os detalhes do produto no modal
-            document.addEventListener('click', function (event) {
+            document.addEventListener('click', function(event) {
                 if (event.target.closest('.menu-item')) {
                     const productCard = event.target.closest('.menu-item');
                     const productName = productCard.getAttribute('data-name');
@@ -339,7 +341,7 @@
             });
 
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const cart = [];
                 const productModal = document.getElementById('productModal');
                 const cartItems = document.getElementById('cart-items');
@@ -350,7 +352,7 @@
                 const searchButton = document.getElementById('search-button');
                 const addToCartBtn = document.getElementById('addToCartBtn');
 
-                productModal.addEventListener('show.bs.modal', function (event) {
+                productModal.addEventListener('show.bs.modal', function(event) {
                     const button = event.relatedTarget;
                     const name = button.getAttribute('data-name');
                     const price = button.getAttribute('data-price');
@@ -365,7 +367,7 @@
                     document.getElementById('note').value = '';
                 });
 
-                addToCartBtn.addEventListener('click', function () {
+                addToCartBtn.addEventListener('click', function() {
                     const name = document.getElementById('productName').textContent;
                     const price = parseFloat(document.getElementById('productPrice').textContent.replace(
                         'R$ ',
@@ -405,7 +407,7 @@
                             <small class="text-muted">Quantidade: ${item.quantity}</small>
                             ${item.note ? `<small class="text-muted d-block">Nota: ${item.note}</small>` : ''}
                         </div>
-                        <span>R$ ${(item.price * item.quantity).toFixed(2)}</span>
+                        <span>R$ ${(item.price * item.quantity)}</span>
                         <button class="btn btn-sm btn-danger remove-item" data-index="${index}">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -413,12 +415,12 @@
                         cartItems.appendChild(li);
                         total += item.price * item.quantity;
                     });
-                    cartTotal.textContent = `R$ ${total.toFixed(2)}`;
+                    cartTotal.textContent = `R$ ${total}`;
                     cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
 
                     // Add event listeners to remove buttons
                     document.querySelectorAll('.remove-item').forEach(button => {
-                        button.addEventListener('click', function () {
+                        button.addEventListener('click', function() {
                             const index = this.getAttribute('data-index');
                             cart.splice(index, 1);
                             updateCart();
@@ -426,27 +428,29 @@
                     });
                 }
 
-                checkoutBtn.addEventListener('click', function () {
-                        let cartDetails = `Pedido finalizado! Total: ${cartTotal.textContent}\n\nItens do carrinho:\n`;
-                        
-                        cart.forEach(item => {
-                            cartDetails += `${item.name} - Quantidade: ${item.quantity} - R$ ${(item.price * item.quantity).toFixed(2)}`;
-                            if (item.note) {
-                                cartDetails += ` (Nota: ${item.note})`;
-                            }
-                            cartDetails += `\n`; 
-                        });
+                checkoutBtn.addEventListener('click', function() {
+                    let cartDetails =
+                        `Pedido finalizado! \n\nItens do carrinho:\n`;
 
-                        cartDetails += `\nTotal do pedido: ${cartTotal.textContent}`;
-                        const message = encodeURIComponent(cartDetails.trim()); 
-                        const phoneNumber = '5511932849265'; 
-
-
-                        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
-                        window.open(whatsappUrl, '_blank');
-                        cart.length = 0;
-                        updateCart();
+                    cart.forEach(item => {
+                        cartDetails +=
+                            `${item.name} - Quantidade: ${item.quantity} - R$ ${(item.price * item.quantity)}`;
+                        if (item.note) {
+                            cartDetails += ` (Nota: ${item.note})`;
+                        }
+                        cartDetails += `\n`;
                     });
+
+                    cartDetails += `\nTotal do pedido: ${cartTotal.textContent}`;
+                    const message = encodeURIComponent(cartDetails.trim());
+                    const phoneNumber = '5511932849265';
+
+
+                    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+                    window.open(whatsappUrl, '_blank');
+                    cart.length = 0;
+                    updateCart();
+                });
 
                 function searchItems() {
                     const searchTerm = searchInput.value.toLowerCase();
@@ -463,7 +467,7 @@
                 }
 
                 searchButton.addEventListener('click', searchItems);
-                searchInput.addEventListener('keyup', function (event) {
+                searchInput.addEventListener('keyup', function(event) {
                     if (event.key === 'Enter') {
                         searchItems();
                     }

@@ -9,12 +9,12 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-        </script>
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"
         integrity="sha512-2rNj2KJ+D8s1ceNasTIex6z4HWyOnEYLVC3FigGOmyQCZc2eBXKgOxQmo3oKLHyfcj53uz4QMsRCWNbLd32Q1g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"
-        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/css/templatemo-style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
@@ -128,7 +128,7 @@
     </div>
 
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             // Função para carregar os estados
             $.ajaxSetup({
                 headers: {
@@ -138,13 +138,13 @@
 
             function carregarEstados() {
                 $.post('/api/estados')
-                    .done(function (data) {
-                        data.forEach(function (val) {
+                    .done(function(data) {
+                        data.forEach(function(val) {
                             $('#estado').append('<option value="' + val.id_estado + '">' + val.nome +
                                 '</option>');
                         });
                     })
-                    .fail(function (xhr, status, error) {
+                    .fail(function(xhr, status, error) {
                         console.error('Erro ao carregar estados:', status, error);
                         console.log('Erro ao carregar estados: ' + xhr.responseText);
                     });
@@ -154,18 +154,18 @@
             function carregarCidades(estadoId) {
                 if (estadoId) {
                     $.post('/api/cidades', {
-                        estado: estadoId
-                    })
-                        .done(function (data) {
+                            estado: estadoId
+                        })
+                        .done(function(data) {
                             $('#cidade').empty().append('<option value="">Selecione a Cidade</option>');
-                            data.forEach(function (val) {
+                            data.forEach(function(val) {
                                 $('#cidade').append('<option value="' + val.id_cidade + '">' + val
                                     .nome + '</option>');
 
                             });
                             $('#cidade').prop('disabled', false);
                         })
-                        .fail(function (xhr, status, error) {
+                        .fail(function(xhr, status, error) {
                             console.error('Erro ao carregar cidades:', status, error);
                             console.log('Erro ao carregar cidades: ' + xhr.responseText);
                         });
@@ -179,19 +179,19 @@
             function carregarBairros(cidadeId) {
                 if (cidadeId) {
                     $.post('/api/bairros', {
-                        cidade: cidadeId
-                    })
-                        .done(function (data) {
+                            cidade: cidadeId
+                        })
+                        .done(function(data) {
                             console.log(data)
                             $('#bairro').empty().prop('disabled', true);
                             $('#bairro').append(' <option value="">Bairro</option>');
-                            $.each(data, function (key, categoria) {
+                            $.each(data, function(key, categoria) {
                                 $('#bairro').append('<option value="' + categoria.id_bairro + '">' +
                                     categoria.nome + '</option>');
                             });
                             $('#bairro').prop('disabled', false);
                         })
-                        .fail(function (xhr, status, error) {
+                        .fail(function(xhr, status, error) {
                             console.error('Erro ao carregar bairros:', status, error);
                             console.log('Erro ao carregar bairros: ' + xhr.responseText);
                             $('#bairro').empty().append('<option value="">Nenhum bairro encontrado</option>')
@@ -206,18 +206,18 @@
             carregarEstados();
 
             // Evento para carregar cidades quando o estado for selecionado
-            $('#estado').on('change', function () {
+            $('#estado').on('change', function() {
                 let estadoId = $(this).val();
                 carregarCidades(estadoId);
             });
 
             // Evento para carregar bairros quando a cidade for selecionada
-            $('#cidade').on('change', function () {
+            $('#cidade').on('change', function() {
                 let cidadeId = $(this).val();
                 carregarBairros(cidadeId);
             });
 
-            $('#tipo').change(function () {
+            $('#tipo').change(function() {
                 var id_tipo = $(this).val();
 
                 $.ajax({
@@ -227,9 +227,9 @@
                         id_tipo: id_tipo,
                         _token: '{{ csrf_token() }}' // Necessário para proteger contra ataques CSRF
                     },
-                    success: function (response) {
+                    success: function(response) {
                         $('#categorias').empty();
-                        $.each(response, function (key, categoria) {
+                        $.each(response, function(key, categoria) {
                             $('#categorias').append(
                                 ' <option value="">Categoria</option>');
 
@@ -243,7 +243,7 @@
             });
 
             // Ação ao clicar no botão Confirmar
-            $('#btn-search').on('click', function () {
+            $('#btn-search').on('click', function() {
                 // Obtém os valores selecionados
                 let estado = $('#estado').find('option:selected').text();
                 let cidade = $('#cidade').find('option:selected').text();
@@ -298,7 +298,7 @@
 
             <script>
                 // Obtém a URL (caminho)
-                const url = window.location.pathname; // Retorna o caminho da URL (exemplo: /estado/cidade/bairro/alo)
+                const url = window.location.pathname;
 
                 // Divide o caminho em segmentos (usando "/" como separador)
                 const segments = url.split('/').filter(segment => segment); // Remove strings vazias
@@ -402,7 +402,8 @@
                     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
                         <div class="card border-0 shadow-sm" style="background-color: #008585; color: white;">
                             <!-- Fundo do card -->
-                            <div class="card-header text-center" style="background-color: #006f6f; border-bottom: none;">
+                            <div class="card-header text-center"
+                                style="background-color: #006f6f; border-bottom: none;">
                                 <h5 class="mb-0">{{ $loja->nome }}</h5> <!-- Nome da loja no cabeçalho -->
                             </div>
                             <figure class="effect-ming tm-video-item">
@@ -443,7 +444,8 @@
                         }
                     @endphp
 
-                    @for ($i = $startPage; $i <= $endPage; $i++) <a href="{{ $lojas->url($i) }}"
+                    @for ($i = $startPage; $i <= $endPage; $i++)
+                        <a href="{{ $lojas->url($i) }}"
                             class="tm-paging-link {{ request()->get('page') == $i || (request()->get('page') == null && $i == 1) ? 'active' : '' }}">
                             {{ $i }}
                         </a>
@@ -532,7 +534,7 @@
     </footer>
 
     <script>
-        $(window).on("load", function () {
+        $(window).on("load", function() {
             $('body').addClass('loaded');
         });
     </script>

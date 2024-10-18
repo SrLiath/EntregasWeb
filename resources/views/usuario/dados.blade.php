@@ -4,10 +4,10 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
     integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous">
-    </script>
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 @include('usuario.templates.menu', ['menu' => 'dado'])
@@ -109,10 +109,8 @@
         <div class="container animate__animated animate__fadeIn">
             <div class="card mb-4">
                 <div class="profile-header">
-                    <img src="https://via.placeholder.com/1200x200" alt="Banner" class="profile-banner"
-                        id="profileBanner">
-                    <img src="https://via.placeholder.com/150" alt="Foto de Perfil" class="profile-photo"
-                        id="profilePhoto">
+                    <img src="{{ $produtos->banner }}" alt="Banner" class="profile-banner" id="profileBanner">
+                    <img src="{{ $produtos->imagem }}" alt="Foto de Perfil" class="profile-photo" id="profilePhoto">
                     <label for="bannerInput" class="change-banner">
                         <i class="fas fa-camera"></i> Alterar Banner
                     </label>
@@ -235,34 +233,77 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            $(document).ready(function () {
-                function readURL(input, targetId) {
+            $(document).ready(function() {
+
+                let isPhotoChanged = false;
+                let isBannerChanged = false;
+
+                // Função para visualizar o preview das imagens e marcar como alterado
+                function readURL(input, targetId, isChangedFlag) {
                     if (input.files && input.files[0]) {
                         var reader = new FileReader();
-
-                        reader.onload = function (e) {
+                        reader.onload = function(e) {
                             $('#' + targetId).attr('src', e.target.result);
-                        }
-
+                        };
                         reader.readAsDataURL(input.files[0]);
+                        isChangedFlag = true;
                     }
                 }
 
-                $("#photoInput").change(function () {
-                    readURL(this, 'profilePhoto');
+                // Marca a mudança da imagem do perfil
+                $("#photoInput").change(function() {
+                    readURL(this, 'profilePhoto', isPhotoChanged);
+                    isPhotoChanged = true;
                 });
 
-                $("#bannerInput").change(function () {
-                    readURL(this, 'profileBanner');
+                // Marca a mudança do banner
+                $("#bannerInput").change(function() {
+                    readURL(this, 'profileBanner', isBannerChanged);
+                    isBannerChanged = true;
                 });
 
-                $('#estabelecimentoForm').on('submit', function (e) {
+                // Submissão do formulário com $.ajax
+                $('#estabelecimentoForm').on('submit', function(e) {
                     e.preventDefault();
-                    Swal.fire({
-                        title: 'Sucesso!',
-                        text: 'Dados salvos com sucesso',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
+
+                    // Cria um objeto FormData para enviar os dados incluindo os arquivos
+                    var formData = new FormData(this);
+
+                    // Remove os arquivos de imagem se não tiverem sido alterados
+                    if (!isPhotoChanged) {
+                        formData.delete('photoInput');
+                    }
+                    if (!isBannerChanged) {
+                        formData.delete('bannerInput');
+                    }
+
+                    // Envia os dados via AJAX
+                    $.ajax({
+                        url: '{{ route('loja.update', $produtos->id) }}', // URL da rota para atualizar
+                        type: 'POST',
+                        data: formData,
+                        processData: false, // Necessário para enviar dados do FormData
+                        contentType: false,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
+                                'content') // Inclui CSRF token
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'Sucesso!',
+                                text: 'Dados salvos com sucesso',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                        },
+                        error: function(response) {
+                            Swal.fire({
+                                title: 'Erro!',
+                                text: 'Ocorreu um erro ao salvar os dados',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
                     });
                 });
             });

@@ -40,9 +40,9 @@ Route::middleware([LojaAdmin::class])->group(function () {
     Route::post('/pedido/completar/{id}', [PedidoController::class, 'completar'])->name('pedido.completar');
     Route::post('/lojas/categorias', [Controller::class, 'adicionarCategoria'])->name('lojas.adicionarCategoria');
     Route::delete('/lojas/categorias/{categoriaNome}', [Controller::class, 'deletarCategoria'])->name('lojas.deletarCategoria');
-    Route::post('/lojas/produtos', [Controller::class, 'adicionarProduto'])->name('lojas.adicionarProduto');
+    Route::post('/api/lojas/produtos', [Controller::class, 'adicionarProduto'])->name('lojas.adicionarProduto');
     Route::delete('/lojas/produtos/{categoriaNome}/{produtoNome}', [Controller::class, 'deletarProduto'])->name('lojas.deletarProduto');
-        Route::get('/loja', function () {
+    Route::get('/loja', function () {
         $user = Auth::user();
 
         if ($user && $user->lojaId) {
@@ -85,11 +85,17 @@ Route::middleware([LojaAdmin::class])->group(function () {
         return view('usuario.itens', ['produtos' => $produtos]);
     });
     Route::get('/loja/produtos', function () {
-        return view('usuario.produtos');
+        $user = Auth::user();
+        $idLoja = $user->lojaId;
+        $produtos = Loja::where(['id' => $idLoja])->first();
+        return view('usuario.produtos', ['produtos' => $produtos->produtos]);
     });
 
     Route::get('/loja/dados', function () {
-        return view('usuario.dados');
+        $user = Auth::user();
+        $idLoja = $user->lojaId;
+        $produtos = Loja::where(['id' => $idLoja])->first();
+        return view('usuario.dados', ['produtos' => $produtos]);
     });
 
     Route::get('/loja/suporte', function () {
