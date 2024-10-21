@@ -119,41 +119,7 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            const galleryItems = {
-                "categorias": [{
-                        "nome": "Pizzas",
-                        "produtos": [{
-                                "nome": "Calabresa",
-                                "preco": "35",
-                                "descricao": null,
-                                "foto": "/lojas/teste/produtos/1729221933-images.jpg"
-                            },
-                            {
-                                "nome": "mussarella",
-                                "preco": "35",
-                                "descricao": null,
-                                "foto": "/lojas/teste/produtos/1729221951-698-pizza-de-mussarela.jpg"
-                            }
-                        ]
-                    },
-                    {
-                        "nome": "esfiha",
-                        "produtos": [{
-                                "nome": "5 esfihas",
-                                "preco": "30",
-                                "descricao": null,
-                                "foto": "/lojas/teste/produtos/1729222025-iStock-537521984-1.jpeg"
-                            },
-                            {
-                                "nome": "10 esfihas",
-                                "preco": "60",
-                                "descricao": null,
-                                "foto": "/lojas/teste/produtos/1729222047-iStock-537521984-1.jpeg"
-                            }
-                        ]
-                    }
-                ]
-            };
+            const galleryItems = {!! $produtos !!}
 
             $(document).ready(function() {
                 const gallery = $('#gallery');

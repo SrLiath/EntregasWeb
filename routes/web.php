@@ -127,8 +127,9 @@ Route::get('/cadastre', function () {
 });
 Route::post('/checkout', [PaymentGateway::class, 'verifyCheckout']);
 Route::get('/checkout', [PaymentGateway::class, 'page']);
+Route::get('/checagem', [PaymentGateway::class, 'checagem']);
 Route::post('/process_payment', [PaymentGateway::class, 'processPayment']);
-
+Route::post('/api/tipos', [Controller::class, 'tipos']);    
 Route::get('/sobre', function () {
     return view('sobre');
 

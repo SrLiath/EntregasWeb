@@ -10,6 +10,11 @@ use App\Models\Categoria;
 use App\Models\Plano;
 class Controller
 {
+    public function tipos()
+    {
+        $tipos = Tipo::all();
+        return response()->json($tipos);
+    }
     public function Tipostore(Request $request)
     {
         // Validação simples

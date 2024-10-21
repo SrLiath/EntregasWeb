@@ -1,6 +1,9 @@
 <html>
 
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+    integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script src="https://sdk.mercadopago.com/js/v2"></script>
 </head>
 
@@ -8,7 +11,12 @@
     <div id="paymentBrick_container">
     </div>
     <script>
-        const mp = new MercadoPago('TEST-a0cc1222-7b79-4565-a855-5eecb40e7af1', {
+                $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        const mp = new MercadoPago('APP_USR-b92a20d0-d3d7-4133-a01a-7005acd288f6', {
             locale: 'pt'
         });
         const bricksBuilder = mp.bricks();
@@ -37,6 +45,7 @@
                         atm: "all",
                         wallet_purchase: "all",
                         onboarding_credits: "all",
+                        bankTransfer: "all",
                         maxInstallments: 12
                     },
                 },
@@ -57,15 +66,21 @@
                                     method: "POST",
                                     headers: {
                                         "Content-Type": "application/json",
+                                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                                     },
                                     body: JSON.stringify(formData),
                                 })
                                 .then((response) => response.json())
                                 .then((response) => {
                                     // receber o resultado do pagamento
+                                    if(response.status == 'success'){
+                                        window.location.href = window.location.origin + `/checagem/?payment_id=${response.payment_id}`
+                                    }
                                     resolve();
                                 })
                                 .catch((error) => {
+                                    console.error(error)
+
                                     // manejar a resposta de erro ao tentar criar um pagamento
                                     reject();
                                 });

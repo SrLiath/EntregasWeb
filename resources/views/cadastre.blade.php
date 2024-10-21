@@ -20,16 +20,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-    </script>
+
 </head>
 
 <body>
+    @include('template.menu')
     <!-- Page Loader -->
     <div id="loader-wrapper">
         <div id="loader"></div>
@@ -562,14 +557,15 @@
                             </label>
                             <h3 class="mb-3">Bairros</h3>
                             <div id="bairrosContainer" class="d-flex flex-wrap justify-content-center"></div>
-                            <div class="mt-3">
-                                <input type="text" id="novoBairro" class="form-control"
-                                    placeholder="Adicionar novo bairro">
-                                <button id="adicionarBairro" class="btn btn-primary mt-2">Adicionar Bairro</button>
-                            </div>
+                           
                         </div>
                     </div>
 
+                </div>
+                <div class="section">
+                    <h2 class="mb-4 text-center">Tipos</h2>
+
+                    <div id="tiposContainer" class="d-flex flex-wrap justify-content-center"></div>
                 </div>
                 <div class="col-12 mb-2">
                     <div class="g-recaptcha" data-sitekey="6LexI14qAAAAAA3joWVkVxqhe-dlSeEN5uKoinXb"></div>
@@ -584,6 +580,69 @@
             </div>
 
             <script>
+            var selectedTypes = [];
+
+            function createButton(id, text, container, type, id_cidade = false) {
+                const button = $('<button>')
+                    .addClass('btn btn-location')
+                    .attr('data-id', id)
+                    .attr('data-type', type)
+                    .text(text)
+                    .click(function () {
+                        $(this).toggleClass('active');
+                        updateSelectedLocations();
+                        if (type === 'estado') {
+                            if ($(this).hasClass('active')) {
+                                carregarCidades(id); 
+                            } else {
+                                removerCidades(id);
+                            }
+                        }else if (type === 'cidade'){
+                            if ($(this).hasClass('active')) {
+                                carregarBairros(id); 
+                            } else {
+                                removerBairros(id);
+                            }
+                        }
+                    })
+                    if(id_cidade){
+                        button.attr('data-cidade-id', id_cidade)
+                    };
+                container.append(button);
+                return button;
+            }
+                  function carregarTiposComoBotoes() {
+            $.ajax({
+                url: '/api/tipos', // URL da rota que retorna os tipos
+                method: 'POST', // Supondo que seja um GET
+                success: function (response) {
+                    // Limpa o container de tipos
+                    $('#tiposContainer').empty();
+
+                    // Cria um botão para cada tipo retornado
+                    $.each(response, function (key, tipo) {
+                        createButton(tipo.id, tipo.tipo, $('#tiposContainer'), 'tipo');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Erro ao carregar tipos:', error);
+                    console.log('Resposta do erro:', xhr.responseText);
+                    
+                    // Exibe uma mensagem caso ocorra um erro
+                    $('#tiposContainer').empty().append('<p>Nenhum tipo encontrado</p>');
+                }
+            });
+        }
+        carregarTiposComoBotoes();
+
+// Função para atualizar as localizações selecionadas (exemplo)
+function updateSelectedLocations() {
+    $('.btn-location.active').each(function () {
+        selectedTypes.push($(this).attr('data-id'));
+    });
+    console.log(`Tipos selecionados: ${selectedTypes.join(', ')}`);
+}
+
                 function onSubmit(token) {
                     document.getElementById("formcadastro").submit();
                 }
@@ -660,35 +719,6 @@
             const bairrosContainer = $('#bairrosContainer');
             const selectedLocations = $('#selectedLocations');
 
-            function createButton(id, text, container, type, id_cidade = false) {
-                const button = $('<button>')
-                    .addClass('btn btn-location')
-                    .attr('data-id', id)
-                    .attr('data-type', type)
-                    .text(text)
-                    .click(function () {
-                        $(this).toggleClass('active');
-                        updateSelectedLocations();
-                        if (type === 'estado') {
-                            if ($(this).hasClass('active')) {
-                                carregarCidades(id); 
-                            } else {
-                                removerCidades(id);
-                            }
-                        }else if (type === 'cidade'){
-                            if ($(this).hasClass('active')) {
-                                carregarBairros(id); 
-                            } else {
-                                removerBairros(id);
-                            }
-                        }
-                    })
-                    if(id_cidade){
-                        button.attr('data-cidade-id', id_cidade)
-                    };
-                container.append(button);
-                return button;
-            }
 
             function updateSelectedLocations() {
                 estados = [];
@@ -907,6 +937,7 @@ $('#btn-search').click(async () => {
             type: 'POST',
             data: dados,
             success: function (response) {
+                // console.log(response)
                 window.location.href = window.location.origin + '/checkout?plano=' + response.message;
             },
             error: function (xhr, error) {
@@ -926,30 +957,8 @@ $('#btn-search').click(async () => {
 
         });
     </script>
+    @include('template.footer')
 
-    <footer class="tm-bg-gray pt-5 pb-3 tm-text-gray tm-footer">
-        <div class="container-fluid tm-container-small">
-            <div class="row">
-                <div class="col-lg-6 col-md-12 col-12 px-5 mb-5">
-                    <h3 class="tm-text-primary mb-4 tm-footer-title">Disk entrega</h3>
-                    <p>Disk entrega é um sistema de locação de lojas</p>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-12 px-5 mb-5">
-                    <ul class="tm-footer-links pl-0">
-                        <li><a href="/cadastre">Contrate</a></li>
-                        <li><a href="/sobre">Sobre nós</a></li>
-                        <li><a href="/contato">Contato</a></li>
-                        <li><a href="/login">Login Estabelecimento</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-8 col-md-7 col-12 px-5 mb-3">
-                    Copyright 2024 Disk entrega.
-                </div>
-            </div>
-        </div>
-    </footer>
 
     <script>
         $(window).on("load", function () {

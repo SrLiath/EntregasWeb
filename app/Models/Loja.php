@@ -17,17 +17,32 @@ class Loja extends Model
         'horario_inicio',
         'horario_fim',
         'id_tipo',
-        'id_categoria',
         'estados_atendidos',
         'cidades_atendidas',
         'bairros_atendidos',
-        'produtos'
+        'produtos',
+        'responsavel',
+        'cpf',
+        'tel',
+        'email',
+        'senha',
+        'site',
+        'insta',
+        'fb',
+        'wpp',
+        'tel2',
+        'abertura',
+        'fechamento',
+        'estabelecimento',
+        'url',
+        'dias'
     ];
 
     protected $casts = [
         'estados_atendidos' => 'array',
         'cidades_atendidas' => 'array',
         'bairros_atendidos' => 'array',
+        // Cast other fields as necessary
     ];
 
     // Relacionamento com o modelo Tipo
