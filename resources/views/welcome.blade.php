@@ -70,34 +70,86 @@
                     .view-more:hover {
                         background-color: #27ae60;
                     }
-                </style>
-                @foreach ($lojas as $loja)
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
-                        <div class="card border-0 shadow-sm" style="background-color: #008585; color: white;">
-                            <!-- Fundo do card -->
-                            <div class="card-header text-center"
-                                style="background-color: #006f6f; border-bottom: none;">
-                                <h5 class="mb-0">{{ $loja->nome }}</h5> <!-- Nome da loja no cabeçalho -->
-                            </div>
-                            <figure class="effect-ming tm-video-item">
-                                <style>
                                     .card {
                                         height: 250px;
+                                        display: flex;
+                                        flex-direction: column;
                                     }
                                     .card-header {
                                         height: 50px;
                                     }
+                                    .card a {
+                                        color: white;
+                                        display: flex;
+                                        flex-direction: column;
+                                    }
+                                    .icone{
+                                        z-index: 999;
+                                    }
                                 </style>
-                                <img src="{{ asset($loja->imagem) }}" alt="Image" class="img-fluid card card-img-top">
-                            </figure>
-                            <div class="mb-1 mt-1 " style="margin-top: -15px !important">
-                                <div class="d-flex justify-content-center">
-                                    <span style="color: white;">Aberto</span> <!-- Status -->
-                                </div>
-                            </div>
-                        </div>
+         @php
+    // Obtém o dia da semana atual (1 = seg, 2 = ter, ..., 7 = dom)
+    $diaSemanaAtual = \Carbon\Carbon::now()->dayOfWeekIso; 
+
+    // Obtém o horário atual
+    $horaAtual = \Carbon\Carbon::now();
+
+    // Chama uma API gratuita para verificar se hoje é feriado
+    $feriado = false; // Inicialmente assume que não é feriado
+
+    // URL de exemplo de uma API de feriados
+    $apiUrl = 'https://api.calendario.com.br/?json=true&ano=' . now()->year . '&estado=SP&cidade=Sao_Paulo&token=YOUR_API_KEY';
+    try {
+        $response = Http::get($apiUrl);
+        $feriados = json_decode($response->body(), true);
+        foreach ($feriados as $f) {
+            if (\Carbon\Carbon::parse($f['date'])->isToday()) {
+                $feriado = true;
+                break;
+            }
+        }
+    } catch (\Exception $e) {
+        // Trate a exceção
+    }
+@endphp
+
+@foreach ($lojas as $loja)
+    @php
+        // Garante que $loja->dia seja um array
+        $diasFuncionamento = is_array($loja->dia) ? $loja->dia : [];
+
+        // Verifica se a loja está aberta hoje e se hoje é um dia válido (inclui feriados)
+        $aberto = in_array($diaSemanaAtual, $diasFuncionamento) || ($feriado && in_array(8, $diasFuncionamento));
+
+        // Verifica se a loja está dentro do horário de funcionamento
+        $horarioInicio = \Carbon\Carbon::parse($loja->horario_inicio);
+        $horarioFim = \Carbon\Carbon::parse($loja->horario_fim);
+        $estaAberta = $horaAtual->between($horarioInicio, $horarioFim);
+    @endphp
+
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
+        <div class="card border-0 shadow-sm " style=" position:relative;background-color: #008585; color: white;">
+            <a href="/{{ $loja->url }}">
+                <div class="card-header text-center" style="background-color: #006f6f; border-bottom: none;">
+                    <h5 class="mb-0">{{ $loja->nome }}</h5>
+                </div>
+                <figure class="effect-ming tm-video-item">
+                    <img src="{{ asset($loja->imagem) }}" alt="Image" class="img-fluid card card-img-top">
+                </figure>
+                <div class="mb-1 mt-1" style="margin-top: -15px !important">
+                    <div class="icone d-flex justify-content-center">
+                        @if($aberto && $estaAberta)
+                            <span style="color: white;">Aberto</span>
+                        @else
+                            <span style="color: white;">Fechado</span>
+                        @endif
                     </div>
-                @endforeach
+                </div>
+            </a>
+        </div>
+    </div>
+@endforeach
+
             @endif
         </div> <!-- row -->
 

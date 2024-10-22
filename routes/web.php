@@ -154,7 +154,7 @@ Route::get('/{estado}', function ($estado) {
         $tipos = Tipo::all();
         return view('welcome', ['lojas' => $lojas, 'tipos' => $tipos]);
     }
-    $loja = Loja::where('nome', $estado)->first();
+    $loja = Loja::where('url', $estado)->first();
     if ($loja) {
         return view('loja', ['loja' => $loja]);
     }

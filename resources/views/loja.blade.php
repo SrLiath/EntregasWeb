@@ -443,7 +443,13 @@
 
                     cartDetails += `\nTotal do pedido: ${cartTotal.textContent}`;
                     const message = encodeURIComponent(cartDetails.trim());
-                    const phoneNumber = '5511932849265';
+                    const ph2oneNumber = '{{$loja->tel}}';
+
+                    function formatPhoneNumber(number) {
+                        const cleanedNumber = number.replace(/\D/g, '');
+                        return '55' + cleanedNumber;
+                    }
+                    const phoneNumber = formatPhoneNumber(ph2oneNumber);
 
 
                     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
