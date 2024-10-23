@@ -73,7 +73,40 @@
                     top: 50%;
                     transform: translateY(-50%);
                 }
+                .btn-tipo {
+                    margin: 5px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    padding: 8px 16px;
+                    transition: all 0.3s ease;
+                    border: 2px solid #e0e0e0;
+                    background-color: white;
+                    color: #333;
+                    position: relative;
+                    overflow: hidden;
+                }
 
+                .btn-tipo:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+
+                .btn-tipo.active {
+                    background-color: #4CAF50;
+                    color: white;
+                    border-color: #4CAF50;
+                    padding-left: 30px;
+                }
+
+                .btn-tipo.active::before {
+                    content: '\f00c';
+                    font-family: 'Font Awesome 5 Free';
+                    font-weight: 900;
+                    position: absolute;
+                    left: 10px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                }
                 #selectedLocations {
                     font-size: 14px;
                     color: #6c757d;
@@ -573,7 +606,7 @@
 
                 <!-- Botão de Confirmar -->
                 <div class="col-12 mb-2">
-                    <button class="btn btn-outline-success tm-search-btn" type="button" id="btn-search">
+                    <button class="btn btn-outline-success tm-search-btn" type="button" id="btn-confirm">
                         <i class="fas fa-check"></i> Confirmar
                     </button>
                 </div>
@@ -581,8 +614,21 @@
 
             <script>
             var selectedTypes = [];
-
+            var tipos = [];
             function createButton(id, text, container, type, id_cidade = false) {
+                if(type=="tipo"){
+                    const button = $('<button>')
+                    .addClass('btn btn-tipo')
+                    .attr('data-id', id)
+                    .attr('data-type', type)
+                    .text(text)
+                    .click(function () {
+                        $(this).toggleClass('active');
+                        updateSelectedLocations();
+                    })
+                        container.append(button);
+                        return button;
+                }
                 const button = $('<button>')
                     .addClass('btn btn-location')
                     .attr('data-id', id)
@@ -618,8 +664,7 @@
                 success: function (response) {
                     // Limpa o container de tipos
                     $('#tiposContainer').empty();
-
-                    // Cria um botão para cada tipo retornado
+                    console.log(response)
                     $.each(response, function (key, tipo) {
                         createButton(tipo.id, tipo.tipo, $('#tiposContainer'), 'tipo');
                     });
@@ -634,15 +679,6 @@
             });
         }
         carregarTiposComoBotoes();
-
-// Função para atualizar as localizações selecionadas (exemplo)
-function updateSelectedLocations() {
-    $('.btn-location.active').each(function () {
-        selectedTypes.push($(this).attr('data-id'));
-    });
-    console.log(`Tipos selecionados: ${selectedTypes.join(', ')}`);
-}
-
                 function onSubmit(token) {
                     document.getElementById("formcadastro").submit();
                 }
@@ -666,7 +702,6 @@ function updateSelectedLocations() {
 
 
     <script>
-        $(document).ready(function () {
             var estados = [];
             var cidades = {};
             var bairros = [];
@@ -724,7 +759,16 @@ function updateSelectedLocations() {
                 estados = [];
                 cidades = {};
                 bairros = [];
-
+                selectedTypes = []
+                tipos = []
+                $('.btn-location.active').each(function () {
+                    selectedTypes.push($(this).attr('data-id'));
+                });
+                $('.btn-tipo.active').each(function () {
+                    tipos.push($(this).attr('data-id'));
+                });
+                
+                console.log(`Tipos selecionados: ${tipos.join(', ')}`);
                 // Adiciona estados selecionados
                 $('.btn-location[data-type="estado"].active').each(function () {
                     const estadoId = $(this).attr('data-id');
@@ -892,10 +936,18 @@ function obterDiasTrabalhados() {
     return diasTrabalhados;
 }
 
-$('#btn-search').click(async () => {
+$('#btn-confirm').click(async () => {
     // Verificar valor do reCAPTCHA
     const recaptchaResponse = grecaptcha.getResponse();
-
+    if($('#url').val() == 'www.diskentregas.com/'){
+        Swal.fire({
+            title: 'Erro!',
+            text: "Preencha o link para o site da loja.",
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+        return
+    }
     // Validar se todos os campos estão preenchidos
     if (
         estados && cidades && bairros && selectedPlanValue &&
@@ -928,7 +980,8 @@ $('#btn-search').click(async () => {
             'fechamento': $('#horario-fechamento').val(),
             'url': $('#url').val(),
             'dias': await obterDiasTrabalhados(),
-            'g-recaptcha-response': recaptchaResponse
+            'g-recaptcha-response': recaptchaResponse,
+            'tipos': tipos
         };
 
         // Realizar a requisição AJAX
@@ -938,7 +991,7 @@ $('#btn-search').click(async () => {
             data: dados,
             success: function (response) {
                 // console.log(response)
-                window.location.href = window.location.origin + '/checkout?plano=' + response.message;
+                window.location.href = window.location.origin + '/checkout?plano=' + response.message + '&user=' + response.user;
             },
             error: function (xhr, error) {
                 console.log(xhr.responseText);
@@ -955,7 +1008,7 @@ $('#btn-search').click(async () => {
     }
 }); // <-- Aqui fechamos a função corretamente
 
-        });
+
     </script>
     @include('template.footer')
 

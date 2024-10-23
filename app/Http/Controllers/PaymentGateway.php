@@ -62,7 +62,21 @@ class PaymentGateway extends Controller
     }
     public function verifyCheckout(Request $request)
     {
-
+        $request->validate([
+            'tipos' => 'required|array', // 'tipos' deve ser um ID válido na tabela 'tipos'
+            'estados' => 'required|array', // 'estados' deve ser um array
+            'cidades' => 'required|array', // 'cidades' deve ser um array
+            'bairros' => 'required|array', // 'bairros' deve ser um array
+            'responsavel' => 'required|string', // 'responsavel' deve ser uma string
+            'tel' => 'required|string', // 'tel' deve ser uma string
+            'site' => 'nullable|string', // 'site' pode ser opcional
+            'insta' => 'nullable|string', // 'insta' pode ser opcional
+            'fb' => 'nullable|string', // 'fb' pode ser opcional
+            'wpp' => 'nullable|string', // 'wpp' pode ser opcional
+            'abertura' => 'required|string', // 'abertura' deve ser uma string (horário)
+            'fechamento' => 'required|string', // 'fechamento' deve ser uma string (horário)
+            'nome-estabelecimento' => 'required|string', // 'nome-estabelecimento' deve ser uma string
+        ]);
         // Verificar o reCAPTCHA
         $recaptchaSecret = env('RECAPTCHA_SECRET_KEY');
         $recaptchaResponse = $request->input('g-recaptcha-response');
@@ -81,6 +95,7 @@ class PaymentGateway extends Controller
         $url = $request->input('url');
         $url = str_replace('www.diskentregas.com/', '', $url);
         $dadosCheckout = [
+            'id_tipo' => $request->input('tipos'),
             'estados_atendidos' => $request->input('estados'),
             'cidades_atendidas' => $request->input('cidades'),
             'bairros_atendidos' => $request->input('bairros'),
@@ -93,7 +108,6 @@ class PaymentGateway extends Controller
             'horario_inicio' => $request->input('abertura'), 
             'horario_fim' => $request->input('fechamento'),
             'nome' => $url,
-            'id_tipo' => $request->input('tipos') ?: 10, 
             'pago' => false,
             'estabelecimento' => $request->input('nome-estabelecimento') ?: 'aaaaaaa'
         ];
@@ -110,7 +124,7 @@ class PaymentGateway extends Controller
         $user = User::create($userData);
 
         $plano = Plano::where('nome', $request->input('plano'))->first();
-        return response()->json(['message' => $plano->id], 201);
+        return response()->json(['message' => $plano->id, 'user' => $user->id], 201);
 
     }
     public function page(Request $request)
@@ -123,6 +137,14 @@ class PaymentGateway extends Controller
     {
         $client = new PaymentClient();
         $payment = $client->get($request->query('payment_id'));
+        $id = $client->get($request->query('user'));
+        $user = User::where('id', $id)->first();
+        $loja = Loja::where('id', $user->lojaId)->first();
+        if ($payment) {
+            $loja->id_payment = $payment; 
+        }
+        $loja->save();
+        
         if ($payment->status == "approved") {
             Loja::where('id_payment', $request->query('payment_id'))
             ->update([

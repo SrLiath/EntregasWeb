@@ -74,7 +74,12 @@
                                 .then((response) => {
                                     // receber o resultado do pagamento
                                     if(response.status == 'success'){
-                                        window.location.href = window.location.origin + `/checagem/?payment_id=${response.payment_id}`
+                                        const currentUrl = window.location.href;
+                                        const url = new URL(currentUrl);
+                                        const params = new URLSearchParams(url.search);
+                                        const userId = params.get('user');
+
+                                        window.location.href = window.location.origin + `/checagem/?payment_id=${response.payment_id}&user=${userId}`
                                     }
                                     resolve();
                                 })

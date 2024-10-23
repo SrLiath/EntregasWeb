@@ -1,5 +1,5 @@
 @include('template.menu')
-        <div class="row tm-mb-90 tm-gallery">
+        <div class="row tm-mb-90 tm-gallery" >
             @if ($lojas->isEmpty())
                 <div class="col-12 mb-5 text-center">
                     <div
@@ -10,6 +10,11 @@
                 </div>
             @else
                 <style>
+                 @media (max-width: 991px) {
+                    .card{
+                       margin-bottom: 50px;
+                    }
+                }
                     .product-grid {
                         display: grid;
                         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -86,6 +91,9 @@
                                     .icone{
                                         z-index: 999;
                                     }
+                                    .card-img{
+                                        height: 250px;
+                                    }
                                 </style>
          @php
     // Obtém o dia da semana atual (1 = seg, 2 = ter, ..., 7 = dom)
@@ -112,42 +120,41 @@
         // Trate a exceção
     }
 @endphp
-
 @foreach ($lojas as $loja)
-    @php
-        // Garante que $loja->dia seja um array
-        $diasFuncionamento = is_array($loja->dia) ? $loja->dia : [];
+@php
+    $diasFuncionamento = is_array($loja->dia) ? $loja->dia : [];
 
-        // Verifica se a loja está aberta hoje e se hoje é um dia válido (inclui feriados)
-        $aberto = in_array($diaSemanaAtual, $diasFuncionamento) || ($feriado && in_array(8, $diasFuncionamento));
+    // Obter a hora atual como objeto Carbon
+    $horaAtual = \Carbon\Carbon::now();
 
-        // Verifica se a loja está dentro do horário de funcionamento
-        $horarioInicio = \Carbon\Carbon::parse($loja->horario_inicio);
-        $horarioFim = \Carbon\Carbon::parse($loja->horario_fim);
-        $estaAberta = $horaAtual->between($horarioInicio, $horarioFim);
-    @endphp
+    // Cria objetos Carbon para os horários de início e fim
+    $horarioInicio = \Carbon\Carbon::createFromFormat('H:i:s', $loja->horario_inicio);
+    $horarioFim = \Carbon\Carbon::createFromFormat('H:i:s', $loja->horario_fim);
 
-    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
-        <div class="card border-0 shadow-sm " style=" position:relative;background-color: #008585; color: white;">
-            <a href="/{{ $loja->url }}">
-                <div class="card-header text-center" style="background-color: #006f6f; border-bottom: none;">
-                    <h5 class="mb-0">{{ $loja->nome }}</h5>
+    // Verifica se a hora atual está dentro do horário de funcionamento
+    $estaAberta = ($horaAtual->greaterThanOrEqualTo($horarioInicio) && $horaAtual->lessThanOrEqualTo($horarioFim));
+@endphp
+
+<div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
+    <div class="card border-0 shadow-sm" style="background-color: #008585; color: white;">
+        <a href="/{{ $loja->url }}">
+            <div class="card-header text-center" style="background-color: #006f6f; border-bottom: none;">
+                <h5 class="mb-0">{{$loja->nome }}</h5>
+            </div>
+            <img src="{{ asset($loja->imagem) }}" alt="Image" class="img-fluid card-img">
+            <div class="status-loja" style="padding: 10px; background-color: #006f6f;">
+                <div class="icone d-flex justify-content-center">
+                    @if($estaAberta)
+                        <span style="color: white;">Aberto</span>
+                    @else
+                        <span style="color: white;">Fechado</span>
+                    @endif
                 </div>
-                <figure class="effect-ming tm-video-item">
-                    <img src="{{ asset($loja->imagem) }}" alt="Image" class="img-fluid card card-img-top">
-                </figure>
-                <div class="mb-1 mt-1" style="margin-top: -15px !important">
-                    <div class="icone d-flex justify-content-center">
-                        @if($aberto && $estaAberta)
-                            <span style="color: white;">Aberto</span>
-                        @else
-                            <span style="color: white;">Fechado</span>
-                        @endif
-                    </div>
-                </div>
-            </a>
-        </div>
+            </div>
+        </a>
     </div>
+</div>
+
 @endforeach
 
             @endif
@@ -187,16 +194,6 @@
             </div>
         </div>
     </div>
-    <!-- container-fluid, tm-container-content -->
-    {{-- <div class="d-flex justify-content-center align-items-center">
-        <div class="col-6 d-flex justify-content-center align-items-center">
-            <form action="" class="tm-text-primary">
-                Pagina <input type="text" value="{{ $lojas->currentPage() }}" size="1"
-                    class="tm-input-paging tm-text-primary">
-                de {{ $lojas->lastPage() }}
-            </form>
-        </div>
-    </div> --}}
     @include('template.footer')
 </body>
 

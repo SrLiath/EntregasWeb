@@ -35,13 +35,15 @@ class Loja extends Model
         'fechamento',
         'estabelecimento',
         'url',
-        'dias'
+        'dias',
+        'pago'
     ];
 
     protected $casts = [
         'estados_atendidos' => 'array',
         'cidades_atendidas' => 'array',
         'bairros_atendidos' => 'array',
+        'id_tipo' => 'array',
         // Cast other fields as necessary
     ];
 
