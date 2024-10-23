@@ -73,6 +73,7 @@
                     top: 50%;
                     transform: translateY(-50%);
                 }
+
                 .btn-tipo {
                     margin: 5px;
                     border-radius: 20px;
@@ -107,6 +108,7 @@
                     top: 50%;
                     transform: translateY(-50%);
                 }
+
                 #selectedLocations {
                     font-size: 14px;
                     color: #6c757d;
@@ -251,17 +253,17 @@
                 <h3>Escolha um plano</h3>
             </center>
             <div class="plans-container">
-            @foreach ($planos as $index => $p)
+                @foreach ($planos as $index => $p)
 
-<div class="plan {{ $index === 0 ? 'selected' : '' }}" onclick="selectPlan(this, 'Plano Brasil')">
-    <h2>{{$p->nome}}</h2>
-    <h3>
-        {{ ($p->valor == floor($p->valor)) ? intval($p->valor) : $p->valor }} R$
-    </h3>
-    <p>{!! $p->descricao !!}</p>
-</div>
+                    <div class="plan {{ $index === 0 ? 'selected' : '' }}" onclick="selectPlan(this, '{{$p->nome}}')">
+                        <h2>{{$p->nome}}</h2>
+                        <h3>
+                            {{ ($p->valor == floor($p->valor)) ? intval($p->valor) : $p->valor }} R$
+                        </h3>
+                        <p>{!! $p->descricao !!}</p>
+                    </div>
 
-@endforeach
+                @endforeach
 
             </div>
             <script>
@@ -374,6 +376,24 @@
                     </div>
                 </div>
                 <script>
+                    function formatLink(input) {
+                        const value = $(input).val().trim();
+
+                        if (value) {
+                            if (!value.startsWith('https://www.') && value != "https://www") {
+                                $(input).val('https://www.' + value.replace(/^https?:\/\//,
+                                    '')); // Remove http:// ou https://, se houver
+                            } else if (value == "https://www") {
+                                $(input).val('')
+                            }
+                        } else {
+                            $(input).val(''); // Se não houver valor, deixa vazio
+                        }
+                    }
+
+                    $('#link-site, #link-instagram, #link-facebook').on('input', function () {
+                        formatLink(this);
+                    });
                     $('#whatsapp').on('input', function () {
                         var input = $(this).val();
 
@@ -421,12 +441,12 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                                <label for="site" class="form-label">Link para o Site</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
-                                <input type="url" class="form-control" id="url" oninput="addPrefix(this)">
-                                </div>
-                            </div>
+                    <label for="site" class="form-label">Link para o Site</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                        <input type="url" class="form-control" id="url" oninput="addPrefix(this)">
+                    </div>
+                </div>
                 <div class="col-12 col-md-4 mb-2">
                     <label class="form-label">Dias trabalhados e feriados</label>
                     <div class="dias-container">
@@ -479,20 +499,20 @@
                         </label>
                     </div>
                 </div>
-              
-                            <script>
-                                                   function addPrefix(input) {
-                            const prefix = "www.diskentregas.com/";
-                            
-                            // Impede repetição do prefixo
-                            if (!input.value.startsWith(prefix)) {
-                                input.value = prefix;
-                            }
+
+                <script>
+                    function addPrefix(input) {
+                        const prefix = "www.diskentregas.com/";
+
+                        if (!input.value.startsWith(prefix)) {
+                            input.value = prefix;
                         }
-                        $(document).ready(()=>{
+                        input.value = input.value.toLowerCase();
+                    }
+                    $(document).ready(() => {
                         var url = $('#url').val('www.diskentregas.com/');
-                        })
-                            </script>
+                    })
+                </script>
                 <style>
                     .dias-container {
                         display: flex;
@@ -590,7 +610,7 @@
                             </label>
                             <h3 class="mb-3">Bairros</h3>
                             <div id="bairrosContainer" class="d-flex flex-wrap justify-content-center"></div>
-                           
+
                         </div>
                     </div>
 
@@ -613,72 +633,75 @@
             </div>
 
             <script>
-            var selectedTypes = [];
-            var tipos = [];
-            function createButton(id, text, container, type, id_cidade = false) {
-                if(type=="tipo"){
-                    const button = $('<button>')
-                    .addClass('btn btn-tipo')
-                    .attr('data-id', id)
-                    .attr('data-type', type)
-                    .text(text)
-                    .click(function () {
-                        $(this).toggleClass('active');
-                        updateSelectedLocations();
-                    })
+                var selectedTypes = [];
+                var tipos = [];
+
+                function createButton(id, text, container, type, id_cidade = false) {
+                    if (type == "tipo") {
+                        const button = $('<button>')
+                            .addClass('btn btn-tipo')
+                            .attr('data-id', id)
+                            .attr('data-type', type)
+                            .text(text)
+                            .click(function () {
+                                $(this).toggleClass('active');
+                                updateSelectedLocations();
+                            })
                         container.append(button);
                         return button;
-                }
-                const button = $('<button>')
-                    .addClass('btn btn-location')
-                    .attr('data-id', id)
-                    .attr('data-type', type)
-                    .text(text)
-                    .click(function () {
-                        $(this).toggleClass('active');
-                        updateSelectedLocations();
-                        if (type === 'estado') {
-                            if ($(this).hasClass('active')) {
-                                carregarCidades(id); 
-                            } else {
-                                removerCidades(id);
+                    }
+                    const button = $('<button>')
+                        .addClass('btn btn-location')
+                        .attr('data-id', id)
+                        .attr('data-type', type)
+                        .text(text)
+                        .click(function () {
+                            $(this).toggleClass('active');
+                            updateSelectedLocations();
+                            if (type === 'estado') {
+                                if ($(this).hasClass('active')) {
+                                    carregarCidades(id);
+                                } else {
+                                    removerCidades(id);
+                                }
+                            } else if (type === 'cidade') {
+                                if ($(this).hasClass('active')) {
+                                    carregarBairros(id);
+                                } else {
+                                    removerBairros(id);
+                                }
                             }
-                        }else if (type === 'cidade'){
-                            if ($(this).hasClass('active')) {
-                                carregarBairros(id); 
-                            } else {
-                                removerBairros(id);
-                            }
-                        }
-                    })
-                    if(id_cidade){
+                        })
+                    if (id_cidade) {
                         button.attr('data-cidade-id', id_cidade)
                     };
-                container.append(button);
-                return button;
-            }
-                  function carregarTiposComoBotoes() {
-            $.ajax({
-                url: '/api/tipos', // URL da rota que retorna os tipos
-                method: 'POST', // Supondo que seja um GET
-                success: function (response) {
-                    // Limpa o container de tipos
-                    $('#tiposContainer').empty();
-                    console.log(response)
-                    $.each(response, function (key, tipo) {
-                        createButton(tipo.id, tipo.tipo, $('#tiposContainer'), 'tipo');
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error('Erro ao carregar tipos:', error);
-                    console.log('Resposta do erro:', xhr.responseText);
-                    
-                    // Exibe uma mensagem caso ocorra um erro
-                    $('#tiposContainer').empty().append('<p>Nenhum tipo encontrado</p>');
+                    container.append(button);
+                    return button;
                 }
-            });
-        }
-        carregarTiposComoBotoes();
+
+                function carregarTiposComoBotoes() {
+                    $.ajax({
+                        url: '/api/tipos', // URL da rota que retorna os tipos
+                        method: 'POST', // Supondo que seja um GET
+                        success: function (response) {
+                            // Limpa o container de tipos
+                            $('#tiposContainer').empty();
+                            console.log(response)
+                            $.each(response, function (key, tipo) {
+                                createButton(tipo.id, tipo.tipo, $('#tiposContainer'), 'tipo');
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Erro ao carregar tipos:', error);
+                            console.log('Resposta do erro:', xhr.responseText);
+
+                            // Exibe uma mensagem caso ocorra um erro
+                            $('#tiposContainer').empty().append('<p>Nenhum tipo encontrado</p>');
+                        }
+                    });
+                }
+                carregarTiposComoBotoes();
+
                 function onSubmit(token) {
                     document.getElementById("formcadastro").submit();
                 }
@@ -702,313 +725,322 @@
 
 
     <script>
-            var estados = [];
-            var cidades = {};
-            var bairros = [];
+        var estados = [];
+        var cidades = {};
+        var bairros = [];
 
-            $('#allest').change(function () {
-                const isChecked = $(this).is(':checked');
-                if (isChecked) {
-                    $('.bairrosdiv').hide();
-                    $('.btn-location[data-type="estado"]').addClass('active');
-                    $('.cidadesDiv').hide();
-                    $('#cidadesContainer').empty();
-                    $('#bairrosContainer').empty();
-                } else {
-                    $('.cidadesDiv').show();
-                    $('.bairrosdiv').show();
-                    $('.btn-location[data-type="estado"]').removeClass('active');
-                    $('#cidadesContainer').empty();
-                    $('#bairrosContainer').empty();
-                }
-                updateSelectedLocations();
-            });
-
-            $('#allcid').change(function () {
-                const isChecked = $(this).is(':checked');
-                if (isChecked) {
-                    $('.bairrosdiv').hide();
-                    $('.btn-location[data-type="cidade"]').addClass('active');
-                    $('#bairrosContainer').empty();
-                } else {
-                    $('.bairrosdiv').show();
-                    $('.btn-location[data-type="cidade"]').removeClass('active');
-                    $('#bairrosContainer').empty();
-
-                }
-                updateSelectedLocations();
-            });
-
-            $('#allbai').change(function () {
-                const isChecked = $(this).is(':checked');
-                if (isChecked) {
-                    $('.btn-location[data-type="bairro"]').addClass('active');
-                } else {
-                    $('.btn-location[data-type="bairro"]').removeClass('active');
-                }
-                updateSelectedLocations();
-            });
-
-            const estadosContainer = $('#estadosContainer');
-            const cidadesContainer = $('#cidadesContainer');
-            const bairrosContainer = $('#bairrosContainer');
-            const selectedLocations = $('#selectedLocations');
-
-
-            function updateSelectedLocations() {
-                estados = [];
-                cidades = {};
-                bairros = [];
-                selectedTypes = []
-                tipos = []
-                $('.btn-location.active').each(function () {
-                    selectedTypes.push($(this).attr('data-id'));
-                });
-                $('.btn-tipo.active').each(function () {
-                    tipos.push($(this).attr('data-id'));
-                });
-                
-                console.log(`Tipos selecionados: ${tipos.join(', ')}`);
-                // Adiciona estados selecionados
-                $('.btn-location[data-type="estado"].active').each(function () {
-                    const estadoId = $(this).attr('data-id');
-                    estados.push($(this).attr('data-id'));
-                    cidades[estadoId] = []; // Inicializa o array para as cidades desse estado
-                });
-
-                // Adiciona cidades selecionadas
-                $('.btn-location[data-type="cidade"].active').each(function () {
-                    const cidadeId = $(this).attr('data-id');
-                    const estadoId = $(this).data('estado-id'); // Acessa o ID do estado relacionado
-                    if (estadoId) {
-                        cidades[estadoId].push($(this)
-                            .attr('data-id')); // Adiciona a cidade ao estado correspondente
-                    }
-                });
-
-                // Adiciona bairros selecionados
-                $('.btn-location[data-type="bairro"].active').each(function () {
-                    bairros.push($(this).attr('data-id'));
-                });
-
-                // Atualiza a exibição das localizações selecionadas
-                selectedLocations.text(
-                    `Estados: ${estados.join(', ')}, Cidades: ${Object.entries(cidades).map(([key, val]) => `${key}: ${val.join(', ')}`).join('; ')}, Bairros: ${bairros.join(', ')}`
-                );
+        $('#allest').change(function () {
+            const isChecked = $(this).is(':checked');
+            if (isChecked) {
+                $('.bairrosdiv').hide();
+                $('.btn-location[data-type="estado"]').addClass('active');
+                $('.cidadesDiv').hide();
+                $('#cidadesContainer').empty();
+                $('#bairrosContainer').empty();
+            } else {
+                $('.cidadesDiv').show();
+                $('.bairrosdiv').show();
+                $('.btn-location[data-type="estado"]').removeClass('active');
+                $('#cidadesContainer').empty();
+                $('#bairrosContainer').empty();
             }
+            updateSelectedLocations();
+        });
 
-            function carregarEstados() {
-                $.post('/api/estados')
+        $('#allcid').change(function () {
+            const isChecked = $(this).is(':checked');
+            if (isChecked) {
+                $('.bairrosdiv').hide();
+                $('.btn-location[data-type="cidade"]').addClass('active');
+                $('#bairrosContainer').empty();
+            } else {
+                $('.bairrosdiv').show();
+                $('.btn-location[data-type="cidade"]').removeClass('active');
+                $('#bairrosContainer').empty();
+
+            }
+            updateSelectedLocations();
+        });
+
+        $('#allbai').change(function () {
+            const isChecked = $(this).is(':checked');
+            if (isChecked) {
+                $('.btn-location[data-type="bairro"]').addClass('active');
+            } else {
+                $('.btn-location[data-type="bairro"]').removeClass('active');
+            }
+            updateSelectedLocations();
+        });
+
+        const estadosContainer = $('#estadosContainer');
+        const cidadesContainer = $('#cidadesContainer');
+        const bairrosContainer = $('#bairrosContainer');
+        const selectedLocations = $('#selectedLocations');
+
+
+        function updateSelectedLocations() {
+            estados = [];
+            cidades = {};
+            bairros = [];
+            selectedTypes = []
+            tipos = []
+            $('.btn-location.active').each(function () {
+                selectedTypes.push($(this).attr('data-id'));
+            });
+            $('.btn-tipo.active').each(function () {
+                tipos.push($(this).attr('data-id'));
+            });
+
+            console.log(`Tipos selecionados: ${tipos.join(', ')}`);
+            // Adiciona estados selecionados
+            $('.btn-location[data-type="estado"].active').each(function () {
+                const estadoId = $(this).attr('data-id');
+                estados.push($(this).attr('data-id'));
+                cidades[estadoId] = []; // Inicializa o array para as cidades desse estado
+            });
+
+            // Adiciona cidades selecionadas
+            $('.btn-location[data-type="cidade"].active').each(function () {
+                const cidadeId = $(this).attr('data-id');
+                const estadoId = $(this).data('estado-id'); // Acessa o ID do estado relacionado
+                if (estadoId) {
+                    cidades[estadoId].push($(this)
+                        .attr('data-id')); // Adiciona a cidade ao estado correspondente
+                }
+            });
+
+            // Adiciona bairros selecionados
+            $('.btn-location[data-type="bairro"].active').each(function () {
+                bairros.push($(this).attr('data-id'));
+            });
+
+            // Atualiza a exibição das localizações selecionadas
+            selectedLocations.text(
+                `Estados: ${estados.join(', ')}, Cidades: ${Object.entries(cidades).map(([key, val]) => `${key}: ${val.join(', ')}`).join('; ')}, Bairros: ${bairros.join(', ')}`
+            );
+        }
+
+        function carregarEstados() {
+            $.post('/api/estados')
+                .done(function (data) {
+                    estadosContainer.empty();
+                    data.forEach(function (val) {
+                        createButton(val.id_estado, val.nome, estadosContainer, 'estado');
+                    });
+                })
+                .fail(function (xhr, status, error) {
+                    console.error('Erro ao carregar estados:', status, error);
+                });
+        }
+
+        function carregarCidades(estadoId) {
+            if (estadoId) {
+                $.post('/api/cidades', {
+                    estado: estadoId
+                })
                     .done(function (data) {
-                        estadosContainer.empty();
-                        data.forEach(function (val) {
-                            createButton(val.id_estado, val.nome, estadosContainer, 'estado');
+                        // Verifica se as cidades já foram carregadas
+                        if (!cidades[estadoId]) {
+                            cidades[estadoId] = []; // Inicializa o array para as cidades desse estado
+                        }
+                        const estadoHeader = $('<h1 class="addmore">').attr('data-estado-id', estadoId).attr(
+                            'data-type', 'bairro').text(data.estado);
+                        cidadesContainer.append(
+                            `<div class="addmore" data-type="bairro" data-estado-id="${estadoId}" style="height: 30px; width: 100vw;"></div>`
+                        );
+
+                        cidadesContainer.append(estadoHeader);
+                        cidadesContainer.append(
+                            `<div class="addmore" data-type="bairro"  data-estado-id="${estadoId}" style="height: 30px; width: 100vw;"></div>`
+                        );
+                        data.cidades.forEach(function (val) {
+                            createButton(val.id_cidade, val.nome, cidadesContainer, 'cidade')
+                                .attr('data-estado-id',
+                                    estadoId); // Adiciona o ID do estado à cidade
                         });
                     })
                     .fail(function (xhr, status, error) {
-                        console.error('Erro ao carregar estados:', status, error);
+                        console.error('Erro ao carregar cidades:', status, error);
                     });
             }
-
-            function carregarCidades(estadoId) {
-                if (estadoId) {
-                    $.post('/api/cidades', {
-                        estado: estadoId
-                    })
-                        .done(function (data) {
-                            // Verifica se as cidades já foram carregadas
-                            if (!cidades[estadoId]) {
-                                cidades[estadoId] = []; // Inicializa o array para as cidades desse estado
-                            }
-                            const estadoHeader = $('<h1 class="addmore">').attr('data-estado-id', estadoId).attr('data-type', 'bairro').text(data.estado);
-                            cidadesContainer.append(`<div class="addmore" data-type="bairro" data-estado-id="${estadoId}" style="height: 30px; width: 100vw;"></div>`);
-                            
-                            cidadesContainer.append(estadoHeader);
-                            cidadesContainer.append(`<div class="addmore" data-type="bairro"  data-estado-id="${estadoId}" style="height: 30px; width: 100vw;"></div>`);
-                            data.cidades.forEach(function (val) {
-                                createButton(val.id_cidade, val.nome, cidadesContainer, 'cidade')
-                                    .attr('data-estado-id',
-                                        estadoId); // Adiciona o ID do estado à cidade
-                            });
-                        })
-                        .fail(function (xhr, status, error) {
-                            console.error('Erro ao carregar cidades:', status, error);
-                        });
-                }
-            }
-
-            function removerCidades(estadoId) {
-                // Remove as cidades relacionadas ao estado que foi desmarcado
-                cidadesContainer.find(`.btn-location[data-estado-id="${estadoId}"]`)
-                    .remove(); 
-                    cidadesContainer.find(`.addmore[data-estado-id="${estadoId}"]`)
-                    .remove(); 
-                updateSelectedLocations(); // Atualiza as localizações selecionadas
-            }
-
-
-            function removerBairros(estadoId) {
-                // Remove as cidades relacionadas ao estado que foi desmarcado
-                bairrosContainer.find(`.btn-location[data-type="bairro"][data-cidade-id="${estadoId}"]`)
-                    .remove(); 
-                    bairrosContainer.find(`.addmore[data-cidade-id="${estadoId}"]`)
-                    .remove(); 
-                updateSelectedLocations(); // Atualiza as localizações selecionadas
-            }
-
-            function carregarBairros(cidadeId) {
-                if (cidadeId) {
-                    $.post('/api/bairros', {
-                        cidade: cidadeId
-                    })
-                    .done(function(data) {
-
-                            if (data.length > 0) {
-                                // Acessa o primeiro bairro do array
-                                const primeiroBairro = data[0];
-
-                                const bairroId = primeiroBairro.id_bairro;
-                                const nomeBairro = primeiroBairro.nome;
-                                const cidadeId = primeiroBairro.cidade;
-
-                                // Criando o cabeçalho do bairro
-                                const estadoHeader = $('<h1 class="addmore">')
-                                    .attr('data-cidade-id', cidadeId)
-                                    .text(nomeBairro);
-
-                                // Adicionando elementos ao contêiner
-                                bairrosContainer.append(`<div class="addmore" data-cidade-id="${cidadeId}" style="height: 30px; width: 100vw;"></div>`);
-                                bairrosContainer.append(estadoHeader);
-                                bairrosContainer.append(`<div class="addmore" data-cidade-id="${cidadeId}" style="height: 30px; width: 100vw;"></div>`);
-                                
-                                // Loop através dos bairros, se necessário
-                                data.forEach(function(val) {
-                                    createButton(val.id_bairro, val.nome_bairro, bairrosContainer, 'bairro',cidadeId);
-                                })
-                            } else {
-                                console.error("Nenhum bairro encontrado.");
-                            }
-                        })
-                        .fail(function (xhr, status, error) {
-                            console.log(xhr.responseText)
-                            console.error('Erro ao carregar bairros:', status, error);
-                        });
-                } else {
-                    bairrosContainer.empty();
-                }
-            }
-
-            $('#adicionarBairro').click(function () {
-                const novoBairro = $('#novoBairro').val().trim();
-                if (novoBairro) {
-                    createButton('novo_' + Date.now(), novoBairro, bairrosContainer, 'bairro');
-                    $('#novoBairro').val('');
-                }
-            });
-
-            carregarEstados();
-
-            // Evento para carregar categorias quando o tipo for selecionado
-            $('#tipo').on('change', function () {
-                let tipoSelecionado = $(this).val();
-                $('#categoria').empty().append('<option value="">Selecione a Categoria</option>');
-                if (tipoSelecionado && categoriasPorTipo[tipoSelecionado]) {
-                    categoriasPorTipo[tipoSelecionado].forEach(function (categoria) {
-                        $('#categoria').append('<option value="' + categoria.valor + '">' +
-                            categoria.texto + '</option>');
-                    });
-                    $('#categoria').prop('disabled', false);
-                } else {
-                    $('#categoria').prop('disabled', true);
-                }
-            });
-            // Função para coletar dias trabalhados
-function obterDiasTrabalhados() {
-    const diasCheckboxes = document.querySelectorAll('.dia-checkbox');
-    const diasTrabalhados = [];
-
-    diasCheckboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            diasTrabalhados.push(parseInt(checkbox.value));
         }
-    });
 
-    return diasTrabalhados;
-}
+        function removerCidades(estadoId) {
+            // Remove as cidades relacionadas ao estado que foi desmarcado
+            cidadesContainer.find(`.btn-location[data-estado-id="${estadoId}"]`)
+                .remove();
+            cidadesContainer.find(`.addmore[data-estado-id="${estadoId}"]`)
+                .remove();
+            updateSelectedLocations(); // Atualiza as localizações selecionadas
+        }
 
-$('#btn-confirm').click(async () => {
-    // Verificar valor do reCAPTCHA
-    const recaptchaResponse = grecaptcha.getResponse();
-    if($('#url').val() == 'www.diskentregas.com/'){
-        Swal.fire({
-            title: 'Erro!',
-            text: "Preencha o link para o site da loja.",
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-        return
-    }
-    // Validar se todos os campos estão preenchidos
-    if (
-        estados && cidades && bairros && selectedPlanValue &&
-        $('#responsavel').val() && $('#cpf').val() && $('#telefone').val() &&
-        $('#email-cobranca').val() && $('#senha').val() &&
-        $('#nome-estabelecimento').val() && $('#link-site').val() &&
-        $('#link-instagram').val() && $('#link-facebook').val() &&
-        $('#whatsapp').val() && $('#telefone-2').val() &&
-        $('#horario-abertura').val() && $('#horario-fechamento').val() &&
-        $('#url').val() && await obterDiasTrabalhados().length > 0 &&
-        recaptchaResponse // Certificar que o reCAPTCHA foi validado
-    ) {
-        var dados = {
-            estados,
-            cidades,
-            bairros,
-            'plano': selectedPlanValue,
-            'responsavel': $('#responsavel').val(),
-            'cpf': $('#cpf').val(),
-            'tel': $('#telefone').val(),
-            'email': $('#email-cobranca').val(),
-            'senha': $('#senha').val(),
-            'nome-estabelecimento': $('#nome-estabelecimento').val(),
-            'site': $('#link-site').val(),
-            'insta': $('#link-instagram').val(),
-            'fb': $('#link-facebook').val(),
-            'wpp': $('#whatsapp').val(),
-            'tel': $('#telefone-2').val(),
-            'abertura': $('#horario-abertura').val(),
-            'fechamento': $('#horario-fechamento').val(),
-            'url': $('#url').val(),
-            'dias': await obterDiasTrabalhados(),
-            'g-recaptcha-response': recaptchaResponse,
-            'tipos': tipos
-        };
 
-        // Realizar a requisição AJAX
-        $.ajax({
-            url: `/checkout`,
-            type: 'POST',
-            data: dados,
-            success: function (response) {
-                // console.log(response)
-                window.location.href = window.location.origin + '/checkout?plano=' + response.message + '&user=' + response.user;
-            },
-            error: function (xhr, error) {
-                console.log(xhr.responseText);
+        function removerBairros(estadoId) {
+            // Remove as cidades relacionadas ao estado que foi desmarcado
+            bairrosContainer.find(`.btn-location[data-type="bairro"][data-cidade-id="${estadoId}"]`)
+                .remove();
+            bairrosContainer.find(`.addmore[data-cidade-id="${estadoId}"]`)
+                .remove();
+            updateSelectedLocations(); // Atualiza as localizações selecionadas
+        }
+
+        function carregarBairros(cidadeId) {
+            if (cidadeId) {
+                $.post('/api/bairros', {
+                    cidade: cidadeId
+                })
+                    .done(function (data) {
+
+                        if (data.length > 0) {
+                            // Acessa o primeiro bairro do array
+                            const primeiroBairro = data[0];
+
+                            const bairroId = primeiroBairro.id_bairro;
+                            const nomeBairro = primeiroBairro.nome;
+                            const cidadeId = primeiroBairro.cidade;
+
+                            // Criando o cabeçalho do bairro
+                            const estadoHeader = $('<h1 class="addmore">')
+                                .attr('data-cidade-id', cidadeId)
+                                .text(nomeBairro);
+
+                            // Adicionando elementos ao contêiner
+                            bairrosContainer.append(
+                                `<div class="addmore" data-cidade-id="${cidadeId}" style="height: 30px; width: 100vw;"></div>`
+                            );
+                            bairrosContainer.append(estadoHeader);
+                            bairrosContainer.append(
+                                `<div class="addmore" data-cidade-id="${cidadeId}" style="height: 30px; width: 100vw;"></div>`
+                            );
+
+                            // Loop através dos bairros, se necessário
+                            data.forEach(function (val) {
+                                createButton(val.id_bairro, val.nome_bairro, bairrosContainer, 'bairro',
+                                    cidadeId);
+                            })
+                        } else {
+                            console.error("Nenhum bairro encontrado.");
+                        }
+                    })
+                    .fail(function (xhr, status, error) {
+                        console.log(xhr.responseText)
+                        console.error('Erro ao carregar bairros:', status, error);
+                    });
+            } else {
+                bairrosContainer.empty();
+            }
+        }
+
+        $('#adicionarBairro').click(function () {
+            const novoBairro = $('#novoBairro').val().trim();
+            if (novoBairro) {
+                createButton('novo_' + Date.now(), novoBairro, bairrosContainer, 'bairro');
+                $('#novoBairro').val('');
             }
         });
-    } else {
-        // Exibir um alerta de erro se algum campo estiver vazio ou o reCAPTCHA não estiver preenchido
-        Swal.fire({
-            title: 'Erro!',
-            text: "Por favor, preencha todos os campos e valide o reCAPTCHA.",
-            icon: 'error',
-            confirmButtonText: 'OK'
+
+        carregarEstados();
+
+        // Evento para carregar categorias quando o tipo for selecionado
+        $('#tipo').on('change', function () {
+            let tipoSelecionado = $(this).val();
+            $('#categoria').empty().append('<option value="">Selecione a Categoria</option>');
+            if (tipoSelecionado && categoriasPorTipo[tipoSelecionado]) {
+                categoriasPorTipo[tipoSelecionado].forEach(function (categoria) {
+                    $('#categoria').append('<option value="' + categoria.valor + '">' +
+                        categoria.texto + '</option>');
+                });
+                $('#categoria').prop('disabled', false);
+            } else {
+                $('#categoria').prop('disabled', true);
+            }
         });
-    }
-}); // <-- Aqui fechamos a função corretamente
+        // Função para coletar dias trabalhados
+        function obterDiasTrabalhados() {
+            const diasCheckboxes = document.querySelectorAll('.dia-checkbox');
+            const diasTrabalhados = [];
 
+            diasCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    diasTrabalhados.push(parseInt(checkbox.value));
+                }
+            });
 
+            return diasTrabalhados;
+        }
+
+        $('#btn-confirm').click(async () => {
+            // Verificar valor do reCAPTCHA
+            const recaptchaResponse = grecaptcha.getResponse();
+            if ($('#url').val() == 'www.diskentregas.com/') {
+                Swal.fire({
+                    title: 'Erro!',
+                    text: "Preencha o link para o site da loja.",
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return
+            }
+            // Validar se todos os campos estão preenchidos
+            if (
+                estados && cidades && bairros && selectedPlanValue &&
+                $('#responsavel').val() && $('#cpf').val() && $('#telefone').val() &&
+                $('#email-cobranca').val() && $('#senha').val() &&
+                $('#nome-estabelecimento').val() && $('#link-site').val() &&
+                $('#link-instagram').val() && $('#link-facebook').val() &&
+                $('#whatsapp').val() && $('#telefone-2').val() &&
+                $('#horario-abertura').val() && $('#horario-fechamento').val() &&
+                $('#url').val() && await obterDiasTrabalhados().length > 0 &&
+                recaptchaResponse // Certificar que o reCAPTCHA foi validado
+            ) {
+                var dados = {
+                    estados,
+                    cidades,
+                    bairros,
+                    'plano': selectedPlanValue,
+                    'responsavel': $('#responsavel').val(),
+                    'cpf': $('#cpf').val(),
+                    'tel': $('#telefone').val(),
+                    'email': $('#email-cobranca').val(),
+                    'senha': $('#senha').val(),
+                    'nome-estabelecimento': $('#nome-estabelecimento').val(),
+                    'site': $('#link-site').val(),
+                    'insta': $('#link-instagram').val(),
+                    'fb': $('#link-facebook').val(),
+                    'wpp': $('#whatsapp').val(),
+                    'tel': $('#telefone-2').val(),
+                    'abertura': $('#horario-abertura').val(),
+                    'fechamento': $('#horario-fechamento').val(),
+                    'url': $('#url').val(),
+                    'dias': await obterDiasTrabalhados(),
+                    'g-recaptcha-response': recaptchaResponse,
+                    'tipos': tipos
+                };
+
+                // Realizar a requisição AJAX
+                $.ajax({
+                    url: `/checkout`,
+                    type: 'POST',
+                    data: dados,
+                    success: function (response) {
+                        // console.log(response)
+                        window.location.href = window.location.origin + '/checkout?plano=' +
+                            response.message + '&user=' + response.user;
+                    },
+                    error: function (xhr, error) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            } else {
+                // Exibir um alerta de erro se algum campo estiver vazio ou o reCAPTCHA não estiver preenchido
+                Swal.fire({
+                    title: 'Erro!',
+                    text: "Por favor, preencha todos os campos e valide o reCAPTCHA.",
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }); // <-- Aqui fechamos a função corretamente
     </script>
     @include('template.footer')
 

@@ -31,7 +31,7 @@ class PaymentGateway extends Controller
         $requestData = [
             "transaction_amount" => $request->transaction_amount, // valor a ser cobrado
             "token" => $request->token, // token gerado pelo Mercado Pago
-            "description" => "Descrição do produto", // descrição do pagamento
+            "description" => "Plano Disk Entregas", // descrição do pagamento
             "installments" => $request->installments, // número de parcelas
             "payment_method_id" => $request->payment_method_id, // método de pagamento
             "payer" => [
@@ -66,7 +66,7 @@ class PaymentGateway extends Controller
             'tipos' => 'required|array', // 'tipos' deve ser um ID válido na tabela 'tipos'
             'estados' => 'required|array', // 'estados' deve ser um array
             'cidades' => 'required|array', // 'cidades' deve ser um array
-            'bairros' => 'required|array', // 'bairros' deve ser um array
+            'bairros' => 'array|null', // 'bairros' deve ser um array
             'responsavel' => 'required|string', // 'responsavel' deve ser uma string
             'tel' => 'required|string', // 'tel' deve ser uma string
             'site' => 'nullable|string', // 'site' pode ser opcional
@@ -105,20 +105,20 @@ class PaymentGateway extends Controller
             'insta' => $request->input('insta'),
             'fb' => $request->input('fb'),
             'wpp' => $request->input('wpp'),
-            'horario_inicio' => $request->input('abertura'), 
+            'horario_inicio' => $request->input('abertura'),
             'horario_fim' => $request->input('fechamento'),
             'nome' => $url,
             'pago' => false,
             'estabelecimento' => $request->input('nome-estabelecimento') ?: 'aaaaaaa'
         ];
-    
+
         $loja = Loja::create($dadosCheckout);
         $userData = [
             'name' => $request->input('nome-estabelecimento'),
             'email' => $request->input('email'),
-            'password' => Hash::make($request->input('senha')), 
+            'password' => Hash::make($request->input('senha')),
             'cpf' => $request->input('cpf'),
-            'is_admin' => 0, 
+            'is_admin' => 0,
             'lojaId' => $loja->id
         ];
         $user = User::create($userData);
@@ -135,26 +135,40 @@ class PaymentGateway extends Controller
 
     public function checagem(Request $request)
     {
-        $client = new PaymentClient();
-        $payment = $client->get($request->query('payment_id'));
-        $id = $client->get($request->query('user'));
-        $user = User::where('id', $id)->first();
-        $loja = Loja::where('id', $user->lojaId)->first();
-        if ($payment) {
-            $loja->id_payment = $payment; 
+        try {
+            $client = new PaymentClient();
+            $payment = $client->get($request->query('payment_id'));
+
+            $user = User::where('id', $request->query('user'))->first();
+            $loja = Loja::where('id', $user->lojaId)->first();
+
+            if ($payment) {
+                $loja->id_payment = $request->query('payment_id');
+            }
+            $loja->save();
+
+            if ($payment->status == "approved") {
+                Loja::where('id_payment', $request->query('payment_id'))
+                    ->update([
+                        'pago' => true,
+                        'dataPlano' => Carbon::now()->addYear()
+                    ]);
+                return redirect('/loja');
+            }
+
+            return view('checagem', ['payment_id' => $request->query('payment_id')]);
+
+        } catch (MPApiException $e) {
+            $apiResponse = $e->getApiResponse();
+            $content = $apiResponse->getContent();
+            $lineNumber = $e->getLine();
+
+            return response()->json([
+                'error' => $content,
+                'line' => $lineNumber,
+                'var' => $payment
+            ], 400);
         }
-        $loja->save();
-        
-        if ($payment->status == "approved") {
-            Loja::where('id_payment', $request->query('payment_id'))
-            ->update([
-                'pago' => true, 
-                'dataPlano' => Carbon::now()->addYear()
-            ]);
-            return redirect('/loja');
-        }
-        
-        return view('checagem', ['payment_id' => $request->query('payment_id')]);
     }
 
 }

@@ -95,9 +95,9 @@ Route::middleware([LojaAdmin::class])->group(function () {
         $user = Auth::user();
         $idLoja = $user->lojaId;
         $produtos = Loja::join('users', 'lojas.id', '=', 'users.lojaId')
-                        ->where('lojas.id', $idLoja)
-                        ->select('lojas.*', 'users.*')  // Seleciona os campos necessários
-                        ->first();
+            ->where('lojas.id', $idLoja)
+            ->select('lojas.*', 'users.*')  // Seleciona os campos necessários
+            ->first();
         return view('usuario.dados', ['produtos' => $produtos]);
     });
 
@@ -113,23 +113,30 @@ Route::get('/xxmigadmin/logout', [AuthController::class, 'logout'])->name('admin
 Route::get('/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
 Route::get('/', function () {
-    $lojas = Loja::paginate(16);
     $tipos = Tipo::all();
+    if (Request::has('tipo')) {
+        $tipoEncoded = Request::get('tipo');
+        $tipoDecoded = urldecode($tipoEncoded);
+        $tipo = Tipo::where('tipo', $tipoDecoded)->first();
+        $lojas = Loja::where('pago', true)->whereJsonContains('id_tipo', strval($tipo->id))->paginate(16);
+        return view('welcome', ['lojas' => $lojas, 'tipos' => $tipos]);
+    }
+    $lojas = Loja::where('pago', true)->paginate(16);
+
     return view('welcome', ['lojas' => $lojas, 'tipos' => $tipos]);
 })->name('index');
 
 Route::get('/cadastre', function () {
-    $lojas = Loja::paginate(16);
     $tipos = Tipo::find('*');
     $planos = Plano::take(3)->get();
 
-    return view('cadastre', ['lojas' => $lojas, 'planos' => $planos]);
+    return view('cadastre', ['planos' => $planos]);
 });
 Route::post('/checkout', [PaymentGateway::class, 'verifyCheckout']);
 Route::get('/checkout', [PaymentGateway::class, 'page']);
 Route::get('/checagem', [PaymentGateway::class, 'checagem']);
 Route::post('/process_payment', [PaymentGateway::class, 'processPayment']);
-Route::post('/api/tipos', [Controller::class, 'tipos']);    
+Route::post('/api/tipos', [Controller::class, 'tipos']);
 Route::get('/sobre', function () {
     return view('sobre');
 
@@ -149,33 +156,58 @@ Route::get('/login', function () {
 Route::get('/{estado}', function ($estado) {
     $estadoObj = Estado::where('nome', $estado)->orWhere('uf', $estado)->first();
 
-    if ($estadoObj) {
-        $lojas = Loja::whereJsonContains('estados_atendidos', $estadoObj->id_estado)->paginate(16);
-        $tipos = Tipo::all();
-        return view('welcome', ['lojas' => $lojas, 'tipos' => $tipos]);
+    if (!$estadoObj) {
+        $loja = Loja::where('nome', $estado)->first();
+        if ($loja) {
+            return view('loja', ['loja' => $loja]);
+        }
     }
-    $loja = Loja::where('url', $estado)->first();
-    if ($loja) {
-        return view('loja', ['loja' => $loja]);
-    }
-    return abort(404, 'Estado ou Loja não encontrado');
-});
 
+    $query = Loja::whereJsonContains('estados_atendidos', $estadoObj->id_estado)
+        ->where('pago', true);
+
+    if (Request::has('tipo')) {
+        $tipoEncoded = Request::get('tipo');
+        $tipoDecoded = urldecode($tipoEncoded);
+        $tipo = Tipo::where('tipo', $tipoDecoded)->first();
+        if ($tipo) {
+            $query->whereJsonContains('id_tipo', strval($tipo->id));
+        }
+    }
+
+    $lojas = $query->paginate(16);
+    $tipos = Tipo::all();
+
+    return view('welcome', ['lojas' => $lojas, 'tipos' => $tipos]);
+});
 
 Route::get('/{estado}/{cidade}', function ($estado, $cidade) {
     $estadoObj = Estado::where('nome', $estado)->orWhere('uf', $estado)->first();
     if (!$estadoObj) {
         return abort(404, 'Estado não encontrado');
     }
+
     $cidadeObj = Cidade::where('nome', $cidade)->where('estado', $estadoObj->id_estado)->first();
     if (!$cidadeObj) {
         return abort(404, 'Cidade não encontrada');
     }
-    $lojas = Loja::whereJsonContains('estados_atendidos', $estadoObj->id_estado)
-        ->whereJsonContains('cidades_atendidas', $cidadeObj->id_cidade)
-        ->paginate(16);
 
+    $query = Loja::whereJsonContains('estados_atendidos', $estadoObj->id_estado)
+        ->whereJsonContains('cidades_atendidas', $cidadeObj->id_cidade)
+        ->where('pago', true);
+
+    if (Request::has('tipo')) {
+        $tipoEncoded = Request::get('tipo');
+        $tipoDecoded = urldecode($tipoEncoded);
+        $tipo = Tipo::where('tipo', $tipoDecoded)->first();
+        if ($tipo) {
+            $query->whereJsonContains('id_tipo', strval($tipo->id));
+        }
+    }
+
+    $lojas = $query->paginate(16);
     $tipos = Tipo::all();
+
     return view('welcome', ['lojas' => $lojas, 'tipos' => $tipos]);
 });
 
@@ -184,29 +216,38 @@ Route::get('/{estado}/{cidade}/{bairro}', function ($estado, $cidade, $bairro) {
     if (!$estadoObj) {
         return abort(404, 'Estado não encontrado');
     }
+
     $cidadeObj = Cidade::where('nome', $cidade)->where('estado', $estadoObj->id_estado)->first();
     if (!$cidadeObj) {
         return abort(404, 'Cidade não encontrada');
     }
+
     $bairroObj = Bairro::where('nome', $bairro)->where('cidade', $cidadeObj->id_cidade)->first();
     if (!$bairroObj) {
         return abort(404, 'Bairro não encontrado');
     }
-    $lojas = Loja::whereJsonContains('estados_atendidos', $estadoObj->id_estado)
+
+    $query = Loja::whereJsonContains('estados_atendidos', $estadoObj->id_estado)
         ->whereJsonContains('cidades_atendidas', $cidadeObj->id_cidade)
         ->whereJsonContains('bairros_atendidos', $bairroObj->id_bairro)
-        ->paginate(16);
+        ->where('pago', true);
 
+    if (Request::has('tipo')) {
+        $tipoEncoded = Request::get('tipo');
+        $tipoDecoded = urldecode($tipoEncoded);
+        $tipo = Tipo::where('tipo', $tipoDecoded)->first();
+        if ($tipo) {
+            $query->whereJsonContains('id_tipo', strval($tipo->id));
+        }
+    }
+
+    $lojas = $query->paginate(16);
     $tipos = Tipo::all();
+
     return view('welcome', ['lojas' => $lojas, 'tipos' => $tipos]);
 });
 
-
-// Rotas para Estados
 Route::post('/api/estados', [LocalidadesController::class, 'estados']);
-// Rotas para Cidades
 Route::post('/api/cidades', [LocalidadesController::class, 'cidades']);
-// Rotas para Bairros
 Route::post('/api/bairros', [LocalidadesController::class, 'bairros']);
-// Rota para deletar um tipo pelo ID
 Route::post('/tipos/categorias', [Controller::class, 'getCategorias']);
