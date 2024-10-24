@@ -38,6 +38,7 @@ Route::middleware([LojaAdmin::class])->group(function () {
     Route::post('/pedido/confirmar/{id}', [PedidoController::class, 'confirmar'])->name('pedido.confirmar');
     Route::post('/pedido/negar/{id}', [PedidoController::class, 'negar'])->name('pedido.negar');
     Route::post('/pedido/completar/{id}', [PedidoController::class, 'completar'])->name('pedido.completar');
+    Route::post('/perfil', [PedidoController::class, 'atualizarLoja'])->name('perfil');
     Route::post('/lojas/categorias', [Controller::class, 'adicionarCategoria'])->name('lojas.adicionarCategoria');
     Route::delete('/lojas/categorias/{categoriaNome}', [Controller::class, 'deletarCategoria'])->name('lojas.deletarCategoria');
     Route::post('/api/lojas/produtos', [Controller::class, 'adicionarProduto'])->name('lojas.adicionarProduto');
@@ -78,12 +79,14 @@ Route::middleware([LojaAdmin::class])->group(function () {
             'teste'
         ]);
     });
+
     Route::get('/loja/categorias', function () {
         $user = Auth::user();
         $idLoja = $user->lojaId;
         $produtos = Loja::where(['id' => $idLoja])->first();
         return view('usuario.itens', ['produtos' => $produtos]);
     });
+
     Route::get('/loja/produtos', function () {
         $user = Auth::user();
         $idLoja = $user->lojaId;

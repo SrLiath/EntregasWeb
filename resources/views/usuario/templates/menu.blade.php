@@ -5,114 +5,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+    .conteudo {
+        display: flex;
+        padding-left: 255px;
+        width 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    @media screen and (max-width: 765px) {
         .conteudo {
             display: flex;
-            padding-left: 255px;
+            padding-left: 0px;
             width 100%;
             height: 100%;
             position: relative;
         }
+    }
 
-        @media screen and (max-width: 765px) {
-            .conteudo {
-                display: flex;
-                padding-left: 0px;
-                width 100%;
-                height: 100%;
-                position: relative;
-            }
-        }
+    /* Estilo customizado para o menu */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        background-color: #f7f7f7;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+    }
 
-        /* Estilo customizado para o menu */
+    .sidebar .nav-link {
+        color: #72739f;
+        padding: 20px;
+        text-align: left;
+        font-size: 1.1em;
+    }
+
+    .sidebar .nav-link .fa {
+        margin-right: 10px;
+        font-size: 1.5em;
+    }
+
+    .sidebar .nav-link.active,
+    .sidebar .nav-link:hover {
+        background-color: #267fdd;
+        color: white !important;
+    }
+
+    /* Barra inferior customizada para mobile */
+    .menu-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #f7f7f7;
+        box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+    }
+
+    .menu-bar .nav-link {
+        color: #72739f;
+        padding: 10px;
+        text-align: center;
+        font-size: 0.9em;
+    }
+
+    .menu-bar .nav-link .fa {
+        display: block;
+        font-size: 1.2em;
+        margin-bottom: 3px;
+    }
+
+    .menu-bar .nav-link.active,
+    .menu-bar .nav-link:hover {
+        background-color: #267fdd;
+        color: white !important;
+    }
+
+    /* Esconde o menu sidebar em telas menores */
+    @media (max-width: 1000px) {
         .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 250px;
-            height: 100%;
-            background-color: #f7f7f7;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-            z-index: 100;
+            display: none;
         }
+    }
 
-        .sidebar .nav-link {
-            color: #72739f;
-            padding: 20px;
-            text-align: left;
-            font-size: 1.1em;
-        }
-
-        .sidebar .nav-link .fa {
-            margin-right: 10px;
-            font-size: 1.5em;
-        }
-
-        .sidebar .nav-link.active,
-        .sidebar .nav-link:hover {
-            background-color: #267fdd;
-            color: white !important;
-        }
-
-        /* Barra inferior customizada para mobile */
+    /* Esconde a barra inferior em telas maiores */
+    @media (min-width: 1000px) {
         .menu-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #f7f7f7;
-            box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
-            z-index: 100;
+            display: none;
         }
+    }
 
-        .menu-bar .nav-link {
-            color: #72739f;
-            padding: 10px;
-            text-align: center;
-            font-size: 0.9em;
-        }
+    /* Estilo do botão sair */
+    .btn-sair {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background-color: #ff4d4d;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
 
-        .menu-bar .nav-link .fa {
-            display: block;
-            font-size: 1.2em;
-            margin-bottom: 3px;
-        }
-
-        .menu-bar .nav-link.active,
-        .menu-bar .nav-link:hover {
-            background-color: #267fdd;
-            color: white !important;
-        }
-
-        /* Esconde o menu sidebar em telas menores */
-        @media (max-width: 1000px) {
-            .sidebar {
-                display: none;
-            }
-        }
-
-        /* Esconde a barra inferior em telas maiores */
-        @media (min-width: 1000px) {
-            .menu-bar {
-                display: none;
-            }
-        }
-
-        /* Estilo do botão sair */
-        .btn-sair {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background-color: #ff4d4d;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .btn-sair:hover {
-            background-color: #ff1a1a;
-        }
+    .btn-sair:hover {
+        background-color: #ff1a1a;
+    }
     </style>
 </head>
 
@@ -202,7 +202,14 @@
             </li>
         </ul>
     </nav>
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    </script>
     <!-- Bootstrap JS e dependências -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

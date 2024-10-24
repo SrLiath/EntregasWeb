@@ -77,6 +77,12 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+            $('#password').keypress(function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $('#loginconfirm').click();
+                }
+            });
             $('#loginconfirm').click(function (e) {
                 e.preventDefault(); // Impede o envio padrão do formulário
 
@@ -96,6 +102,7 @@
                     },
                     error: function (xhr) {
                         // Limpa qualquer alerta anterior
+                        console.log(xhr.responseText)
                         if (xhr.status === 422) { // Erro de validação
                             var errors = xhr.responseJSON.errors;
                             var errorMessages = '';

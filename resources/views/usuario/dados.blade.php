@@ -4,15 +4,14 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
     integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous">
-</script>
+    </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-</script>
+    </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 @include('usuario.templates.menu', ['menu' => 'dado'])
 <div class="conteudo">
-    <!DOCTYPE html>
     <html lang="pt-br">
 
     <head>
@@ -126,31 +125,34 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="nomeEstabelecimento" class="form-label">Nome do Estabelecimento</label>
-                                <input type="text" class="form-control" value="{{ $produtos->estabelecimento}}" id="nomeEstabelecimento" required>
+                                <input type="text" class="form-control" value="{{ $produtos->estabelecimento}}"
+                                    id="nomeEstabelecimento">
                             </div>
                             <div class="col-md-6">
                                 <label for="cpf" class="form-label">CPF</label>
-                                <input type="text" class="form-control" value="{{ $produtos->cpf}}"  id="cpf" required>
+                                <input type="text" class="form-control" value="{{ $produtos->cpf}}" id="cpf">
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="emailCobranca" class="form-label">Email de Cobrança</label>
-                                <input type="email" class="form-control" value="{{ $produtos->email}}"  id="emailCobranca" required>
+                                <input type="email" class="form-control" value="{{ $produtos->email}}"
+                                    id="emailCobranca">
                             </div>
                             <div class="col-md-6">
                                 <label for="telefone" class="form-label">Telefone</label>
-                                <input type="tel" class="form-control" value="{{ $produtos->estabelecimento}}"  id="telefone" required>
+                                <input type="tel" class="form-control" value="{{ $produtos->estabelecimento}}"
+                                    id="telefone">
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="login" class="form-label">Login</label>
-                                <input type="text" value="{{ $produtos->email}}"  class="form-control" id="login" required>
+                                <input type="text" value="{{ $produtos->email}}" class="form-control" id="login">
                             </div>
                             <div class="col-md-6">
                                 <label for="senha" class="form-label">Senha</label>
-                                <input type="password" class="form-control" id="senha" required>
+                                <input type="password" class="form-control" id="senha">
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -158,78 +160,79 @@
                                 <label for="site" class="form-label">Link para o Site</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-globe"></i></span>
-                                    <input type="url" class="form-control" value="{{ $produtos->site}}"  id="site">
+                                    <input type="url" class="form-control" value="{{ $produtos->site}}" id="site">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <label for="instagram" class="form-label">Link para o Instagram</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fab fa-instagram"></i></span>
-                                    <input type="url" class="form-control" value="{{ $produtos->insta}}"  id="instagram">
+                                    <input type="url" class="form-control" value="{{ $produtos->insta}}" id="instagram">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <label for="facebook" class="form-label">Link para o Facebook</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fab fa-facebook"></i></span>
-                                    <input type="url" class="form-control" value="{{ $produtos->fb}}"  id="facebook">
+                                    <input type="url" class="form-control" value="{{ $produtos->fb}}" id="facebook">
                                 </div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="whatsapp" class="form-label">WhatsApp</label>
-                                <input type="tel" class="form-control" value="{{ $produtos->wpp}}"  id="whatsapp">
+                                <input type="tel" class="form-control" value="{{ $produtos->wpp}}" id="whatsapp">
                             </div>
                             <script>
-                                      $('#whatsapp').on('input', function () {
-                        var input = $(this).val();
+                                $('#whatsapp').on('input', function () {
+                                    var input = $(this).val();
 
-                        // Remove qualquer caractere que não seja número
-                        input = input.replace(/\D/g, '');
+                                    // Remove qualquer caractere que não seja número
+                                    input = input.replace(/\D/g, '');
 
-                        // Formata o número para o formato (xx) xxxxx-xxxx
-                        if (input.length > 10) {
-                            input = input.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
-                        } else if (input.length > 6) {
-                            input = input.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-                        } else if (input.length > 2) {
-                            input = input.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
-                        } else {
-                            input = input.replace(/^(\d*)/, '($1');
-                        }
+                                    // Formata o número para o formato (xx) xxxxx-xxxx
+                                    if (input.length > 10) {
+                                        input = input.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                                    } else if (input.length > 6) {
+                                        input = input.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+                                    } else if (input.length > 2) {
+                                        input = input.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+                                    } else {
+                                        input = input.replace(/^(\d*)/, '($1');
+                                    }
 
-                        // Atualiza o valor do campo de entrada
-                        $(this).val(input);
-                    });
-               
+                                    // Atualiza o valor do campo de entrada
+                                    $(this).val(input);
+                                });
                             </script>
                             <div class="col-md-6">
                                 <label for="url" class="form-label">Url do site</label>
-                                <input type="url" class="form-control" id="url" oninput="addPrefix(this)">
+                                <input class="form-control" id="url" oninput="addPrefix(this)">
                             </div>
                         </div>
                         <script>
-                        function addPrefix(input) {
-                            const prefix = "www.diskentregas.com/";
-                            
-                            // Impede repetição do prefixo
-                            if (!input.value.startsWith(prefix)) {
-                                input.value = prefix;
+                            function addPrefix(input) {
+                                const prefix = "www.diskentregas.com/";
+
+                                // Impede repetição do prefixo
+                                if (!input.value.startsWith(prefix)) {
+                                    input.value = prefix;
+                                }
                             }
-                        }
-                        $(document).ready(()=>{
-                        var url = $('#url').val('www.diskentregas.com/'+ '{{ $produtos->nome}}');
-                        })
+                            $(document).ready(() => {
+                                var url = $('#url').val('www.diskentregas.com/' + '{{ $produtos->nome}}');
+                            })
                         </script>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="horarioAbertura" class="form-label">Horário de Abertura</label>
-                                <input type="time" class="form-control" value="{{ $produtos->horario_inicio }}" id="horarioAbertura" required>
+                                <input type="time" class="form-control" value="{{ $produtos->horario_inicio }}"
+                                    id="horarioAbertura">
                             </div>
                             <div class="col-md-6">
                                 <label for="horarioFechamento" class="form-label">Horário de Fechamento</label>
-                                <input type="time" class="form-control" value="{{ $produtos->horario_fim }}" id="horarioFechamento" required>
+                                <input type="time" class="form-control" value="{{ $produtos->horario_fim }}"
+                                    id="horarioFechamento">
                             </div>
                         </div>
 
@@ -245,53 +248,131 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            $(document).ready(function() {
+            $(document).ready(function () {
+                let isPhotoChanged = false; // Inicializa como false
+                let isBannerChanged = false; // Inicializa como false
 
-                let isPhotoChanged = false;
-                let isBannerChanged = false;
+                // Armazena os valores iniciais dos inputs
+                const initialValues = {
+                    nomeEstabelecimento: $('#nomeEstabelecimento').val(),
+                    cpf: $('#cpf').val(),
+                    emailCobranca: $('#emailCobranca').val(),
+                    telefone: $('#telefone').val(),
+                    login: $('#login').val(),
+                    senha: $('#senha').val(),
+                    site: $('#site').val(),
+                    instagram: $('#instagram').val(),
+                    facebook: $('#facebook').val(),
+                    whatsapp: $('#whatsapp').val(),
+                    horarioAbertura: $('#horarioAbertura').val(),
+                    horarioFechamento: $('#horarioFechamento').val()
+                };
 
                 // Função para visualizar o preview das imagens e marcar como alterado
                 function readURL(input, targetId, isChangedFlag) {
                     if (input.files && input.files[0]) {
                         var reader = new FileReader();
-                        reader.onload = function(e) {
+                        reader.onload = function (e) {
                             $('#' + targetId).attr('src', e.target.result);
                         };
                         reader.readAsDataURL(input.files[0]);
-                        isChangedFlag = true;
+                        isChangedFlag = true; // Altera o estado externo
                     }
                 }
 
                 // Marca a mudança da imagem do perfil
-                $("#photoInput").change(function() {
+                $("#photoInput").change(function () {
                     readURL(this, 'profilePhoto', isPhotoChanged);
-                    isPhotoChanged = true;
+                    isPhotoChanged = true; // Altera o estado externo
                 });
 
                 // Marca a mudança do banner
-                $("#bannerInput").change(function() {
+                $("#bannerInput").change(function () {
                     readURL(this, 'profileBanner', isBannerChanged);
-                    isBannerChanged = true;
+                    isBannerChanged = true; // Altera o estado externo
                 });
 
                 // Submissão do formulário com $.ajax
-                $('#estabelecimentoForm').on('submit', function(e) {
+                $('#estabelecimentoForm').on('submit', function (e) {
                     e.preventDefault();
 
                     // Cria um objeto FormData para enviar os dados incluindo os arquivos
-                    var formData = new FormData(this);
+                    var formData = new FormData();
 
-                    // Remove os arquivos de imagem se não tiverem sido alterados
-                    if (!isPhotoChanged) {
-                        formData.delete('photoInput');
+                    // Verifica e adiciona apenas se os valores foram alterados
+                    let nomeEstabelecimento = $('#nomeEstabelecimento').val();
+                    if (nomeEstabelecimento !== initialValues.nomeEstabelecimento) {
+                        formData.append('nomeEstabelecimento', nomeEstabelecimento);
                     }
-                    if (!isBannerChanged) {
-                        formData.delete('bannerInput');
+
+                    let cpf = $('#cpf').val();
+                    if (cpf !== initialValues.cpf) {
+                        formData.append('cpf', cpf);
+                    }
+
+                    let emailCobranca = $('#emailCobranca').val();
+                    if (emailCobranca !== initialValues.emailCobranca) {
+                        formData.append('emailCobranca', emailCobranca);
+                    }
+
+                    let telefone = $('#telefone').val();
+                    if (telefone !== initialValues.telefone) {
+                        formData.append('telefone', telefone);
+                    }
+
+                    let login = $('#login').val();
+                    if (login !== initialValues.login) {
+                        formData.append('login', login);
+                    }
+
+                    let senha = $('#senha').val();
+                    if (senha !== initialValues.senha) {
+                        formData.append('senha', senha);
+                    }
+
+                    let site = $('#site').val();
+                    if (site !== initialValues.site) {
+                        formData.append('site', site);
+                    }
+
+                    let instagram = $('#instagram').val();
+                    if (instagram !== initialValues.instagram) {
+                        formData.append('instagram', instagram);
+                    }
+
+                    let facebook = $('#facebook').val();
+                    if (facebook !== initialValues.facebook) {
+                        formData.append('facebook', facebook);
+                    }
+
+                    let whatsapp = $('#whatsapp').val();
+                    if (whatsapp !== initialValues.whatsapp) {
+                        formData.append('whatsapp', whatsapp);
+                    }
+
+                    let horarioAbertura = $('#horarioAbertura').val();
+                    if (horarioAbertura !== initialValues.horarioAbertura) {
+                        formData.append('horarioAbertura', horarioAbertura);
+                    }
+
+                    let horarioFechamento = $('#horarioFechamento').val();
+                    if (horarioFechamento !== initialValues.horarioFechamento) {
+                        formData.append('horarioFechamento', horarioFechamento);
+                    }
+
+                    // Adiciona arquivos de imagem se alterados
+                    if (isPhotoChanged) {
+                        formData.append('imagem', $('#photoInput')[0].files[
+                            0]); // 'imagem' é o nome esperado no servidor
+                    }
+                    if (isBannerChanged) {
+                        formData.append('banner', $('#bannerInput')[0].files[
+                            0]); // 'banner' é o nome esperado no servidor
                     }
 
                     // Envia os dados via AJAX
                     $.ajax({
-                        url: '', // URL da rota para atualizar
+                        url: '{{ route("perfil") }}', // URL da rota para atualizar
                         type: 'POST',
                         data: formData,
                         processData: false, // Necessário para enviar dados do FormData
@@ -300,18 +381,26 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
                                 'content') // Inclui CSRF token
                         },
-                        success: function(response) {
+                        success: function (response) {
                             Swal.fire({
                                 title: 'Sucesso!',
                                 text: 'Dados salvos com sucesso',
                                 icon: 'success',
                                 confirmButtonText: 'OK'
                             });
+                            console.log(response);
+                            console.log(response.request);
                         },
-                        error: function(response) {
+                        error: function (xhr, status, error) {
+                            let errorMessage = 'Ocorreu um erro. Por favor, tente novamente.';
+
+                            if (xhr.responseText) {
+                                errorMessage = xhr.responseText;
+                            }
+
                             Swal.fire({
                                 title: 'Erro!',
-                                text: 'Ocorreu um erro ao salvar os dados',
+                                text: errorMessage,
                                 icon: 'error',
                                 confirmButtonText: 'OK'
                             });
@@ -320,6 +409,8 @@
                 });
             });
         </script>
+
+
     </body>
 
     </html>
